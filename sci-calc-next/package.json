@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "report:submission": "node scripts/generate-submission-html.mjs"
   },
   "dependencies": {
     "next": "15.5.4",
@@ -24,6 +25,6 @@
     "eslint-config-next": "15.5.4",
     "prettier": "^3",
     "typescript": "^5",
-    "vitest": "^2"
+    "vitest": "^3.2.4"
   }
 }

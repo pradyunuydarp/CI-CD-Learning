@@ -18,7 +18,8 @@ This report documents the implementation of the SciCalc Next scientific calculat
 \begin{itemize}[leftmargin=*]
   \item Frontend built with Next.js 15 (App Router) and TypeScript.
   \item Domain logic implemented in a dedicated \texttt{src/lib} module for reuse across API routes and unit tests.
-  \item Client UI delivered through a single calculator component rendered on the home page.
+  \item Client UI delivered through a revitalised calculator workspace with expression parsing, quick-operation toggles, and clipboard support.
+  \item Visual styling leverages a glassmorphic theme, responsive panel/sidebar layout, and semantic labelling for improved accessibility.
 \end{itemize}
 
 \section{CI/CD Implementation}
@@ -28,9 +29,15 @@ The Jenkins pipeline installs dependencies, runs quality gates (linting and unit
 A multi-stage Dockerfile produces a lean runtime image based on \texttt{node:20-alpine}. Ansible playbooks pull the published image and ensure the container remains running with an exposed port of 3000.
 
 \section{Results and Screenshots}
-Include screenshots from local development, CI executions, and deployment verification steps as they become available.
+The redesigned interface surfaces contextual guidance, responsive layouts, and clipboard-enabled results. Captured UI previews are tracked under \texttt{../screenshots/} for auditability:
+\begin{itemize}[leftmargin=*]
+  \item Screenshot 2025-09-30 at 21.03.48 --- dark theme overview of the calculator shell.
+  \item Screenshot 2025-09-30 at 21.10.27 --- expression parsing and quick action controls in use.
+  \item Screenshot 2025-09-30 at 21.11.19 --- factorial input validation state.
+  \item Screenshot 2025-09-30 at 21.50.52 --- result panel with copy feedback messaging.
+\end{itemize}
 
 \section{Learnings and Improvements}
-Document challenges, optimisations, and future enhancements discovered during the implementation of this project.
+Expression parsing introduced edge cases around negative factorials and whitespace that are now guarded inside the UI before API submission. Future iterations should add automated UI tests to cover copy-to-clipboard fallbacks and broaden accessibility audits.
 
 \end{document}
