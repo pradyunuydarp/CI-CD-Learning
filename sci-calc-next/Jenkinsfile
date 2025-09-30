@@ -1,0 +1,64 @@
+pipeline {
+  agent any
+
+  environment {
+    NODE_ENV = 'development'
+    DOCKER_IMAGE = 'sci-calc-next:latest'
+  }
+
+  options {
+    timestamps()
+    ansiColor('xterm')
+  }
+
+  stages {
+    stage('Install') {
+      steps {
+        sh 'node -v'
+        sh 'npm ci'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npm run lint'
+        sh 'npm run test'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+
+    stage('Docker Build & Push') {
+      steps {
+        script {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'dockerhub',
+              usernameVariable: 'DOCKERHUB_USER',
+              passwordVariable: 'DOCKERHUB_TOKEN'
+            )
+          ]) {
+            sh '''
+              set -eux
+              IMAGE="$DOCKERHUB_USER/sci-calc-next:latest"
+              echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+              docker build -t "$IMAGE" .
+              docker push "$IMAGE"
+              docker logout
+            '''
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    failure {
+      echo 'Pipeline failed. Review the logs for details.'
+    }
+  }
+}

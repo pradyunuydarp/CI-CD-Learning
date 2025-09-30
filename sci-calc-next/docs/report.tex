@@ -1,0 +1,36 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{enumitem}
+
+\title{SciCalc Next CI/CD Report}
+\author{Pradyun Devarakonda}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This report documents the implementation of the SciCalc Next scientific calculator application and its accompanying DevOps pipeline. It summarises the project scope, tooling, and the automation built to support repeatable delivery.
+
+\section{Setup and Architecture}
+\begin{itemize}[leftmargin=*]
+  \item Frontend built with Next.js 15 (App Router) and TypeScript.
+  \item Domain logic implemented in a dedicated \texttt{src/lib} module for reuse across API routes and unit tests.
+  \item Client UI delivered through a single calculator component rendered on the home page.
+\end{itemize}
+
+\section{CI/CD Implementation}
+The Jenkins pipeline installs dependencies, runs quality gates (linting and unit tests), executes a production build, and publishes a Docker image to Docker Hub. Credentials are injected securely via Jenkins.
+
+\section{Docker and Ansible Deployment}
+A multi-stage Dockerfile produces a lean runtime image based on \texttt{node:20-alpine}. Ansible playbooks pull the published image and ensure the container remains running with an exposed port of 3000.
+
+\section{Results and Screenshots}
+Include screenshots from local development, CI executions, and deployment verification steps as they become available.
+
+\section{Learnings and Improvements}
+Document challenges, optimisations, and future enhancements discovered during the implementation of this project.
+
+\end{document}
