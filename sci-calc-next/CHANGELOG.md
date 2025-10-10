@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2025-10-10
+- Expanded the CI/CD report with Jenkins and Ansible code snippets plus an appendix for pasting the latest instructions and screenshots.
+
+Author: CDX
+
 ## [0.3.3] - 2025-10-10
 - Added email notifications to the Jenkins pipeline, driven by the `NOTIFY_EMAILS` environment variable so teams can opt-in per job.
 - Included build metadata and resolved host port in the success message, with console logs attached to failure notices.

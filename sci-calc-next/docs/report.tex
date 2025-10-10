@@ -56,13 +56,93 @@ Each item from the mini project checklist is satisfied as follows:
   \item \textbf{Playbooks} --- \texttt{playbooks/ping.yml} checks connectivity. \texttt{playbooks/deploy.yml} logs in, pulls, and manages the container with the \texttt{always} restart policy without requiring sudo access.
 \end{itemize}
 
+\section{Key Configuration Snippets}
+\subsection*{Jenkins Pipeline Excerpt}
+\begin{verbatim}
+post {
+  success {
+    script {
+      if (env.NOTIFY_EMAILS?.trim()) {
+        emailext(
+          to: env.NOTIFY_EMAILS,
+          subject: "SciCalc Next build #${env.BUILD_NUMBER} succeeded",
+          mimeType: 'text/html',
+          body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>\n<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"""
+        )
+      }
+    }
+  }
+  failure {
+    echo 'Pipeline failed. Review the logs for details.'
+    script {
+      if (env.NOTIFY_EMAILS?.trim()) {
+        emailext(
+          to: env.NOTIFY_EMAILS,
+          subject: "SciCalc Next build #${env.BUILD_NUMBER} failed",
+          mimeType: 'text/html',
+          body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>\n<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>""",
+          attachLog: true
+        )
+      }
+    }
+  }
+}
+\end{verbatim}
+
+\subsection*{Ansible Deploy Playbook Core}
+\begin{verbatim}
+- name: Stop existing SciCalc Next container
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: stopped
+  ignore_errors: true
+
+- name: Remove existing SciCalc Next container
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    state: absent
+  ignore_errors: true
+
+- name: Ensure SciCalc Next container is running
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    image: "{{ docker_image }}"
+    state: started
+    recreate: true
+    force_kill: true
+    restart_policy: always
+    published_ports:
+      - "{{ host_port }}:{{ container_port }}"
+    env:
+      NODE_ENV: production
+\end{verbatim}
+
+\subsection*{Job Environment Expectations}
+\begin{verbatim}
+# Jenkins job -> Configure -> Pipeline properties
+NOTIFY_EMAILS=alice@example.com,bob@example.com
+
+# Docker image is exported by the pipeline after the push stage
+# Host port is dynamically set before running Ansible
+\end{verbatim}
+
 \section{Results and Evidence}
 \begin{itemize}[leftmargin=*]
   \item Latest Docker push digest: pending next Jenkins run after the interpreter fix.
   \item Deployment recap: Ansible now frees any stale container, selects an available host port automatically, and is expected to recreate the service on the next Jenkins rerun (the interpreter issue is already fixed).
   \item Commands to reproduce locally: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, \texttt{ansible-playbook playbooks/deploy.yml}.
   \item Notification recap: Jenkins emails the addresses in `NOTIFY\_EMAILS` after each run, sharing the build URL, Docker image tag, and resolved host port.
+  \item Documentation recap: This report now embeds the core Jenkins/Ansible snippets and includes an appendix where we can paste the latest instructions and screenshots.
 \end{itemize}
+
+\section{Appendix: Paste-In Artefacts}
+\subsection*{Original Instructions}
+\begin{verbatim}
+<<< Paste the latest brief or requirement set here so the document stays self-contained. >>>
+\end{verbatim}
+
+\subsection*{Screenshot Drop Zone}
+The figure placeholders below are ready for actual assets. Replace the sample paths with your captures or paste additional figures right here.
 
 \noindent Placeholder screenshots (replace the filenames with real captures once collected):
 \begin{figure}[h]
