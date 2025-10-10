@@ -3,9 +3,6 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{enumitem}
-\usepackage{titlesec}
-\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
-\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
 
 \title{SciCalc Next CI/CD Report}
 \author{Pradyun Devarakonda}
@@ -13,6 +10,12 @@
 
 \begin{document}
 \maketitle
+\begin{center}
+\vspace{0.5em}\textbf{Quick Links:}\\
+GitHub: https://github.com/pradyunuydarp/CI-CD-Learning.git \\
+Docker Hub: https://hub.docker.com/repository/docker/pradyunuydarp/sci-calc-next/general \\
+\end{center}
+\par\vspace{1em}
 
 \section{DevOps Overview}
 \subsection*{What and Why}
@@ -203,12 +206,8 @@ The deploy playbook removes stale containers, pulls the requested image, and rec
 During the successful Jenkins run, the play recap reported \texttt{ok=3 changed=1 failed=0}, confirming the container restart on the new port.
 
 \section{Application Experience}
-\begin{itemize}[leftmargin=*]
-  \item Users select one of four operations (square root, factorial, natural logarithm, exponentiation) and enter operands. Validation feedback appears inline beneath the form.
-  \item Results are rendered alongside the input panel, with formatting that distinguishes success, domain errors, and invalid requests.
-  \item API throttling is avoided by executing calculations on the server via the \texttt{/api/calc} route, enabling consistent behaviour between local runs and containerised deployments.
-\end{itemize}
-Figure~\ref{fig:ui} illustrates the interface with multiple operations executed during manual testing.
+\section{Runtime Access}
+A secure tunnel is exposed through ngrok during local demos so remote reviewers can reach the calculator without opening firewall ports.
 
 \section{Results and Verification}
 \begin{itemize}[leftmargin=*]
@@ -220,8 +219,8 @@ Figure~\ref{fig:ui} illustrates the interface with multiple operations executed 
 
 \section{References and Access}
 \begin{itemize}[leftmargin=*]
-  \item GitHub repository: \href{https://github.com/pradyunuydarp/CI-CD-Learning}{https://github.com/pradyunuydarp/CI-CD-Learning}
-  \item Docker Hub image: \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next}{https://hub.docker.com/r/pradyunuydarp/sci-calc-next}
+  \item GitHub repository:  https://github.com/pradyunuydarp/CI-CD-Learning.git
+  \item Docker Hub image: https://hub.docker.com/repository/docker/pradyunuydarp/sci-calc-next/general
   \item Jenkins job: hosted on the local Jenkins master (\texttt{https://<jenkins-host>/job/SciCalc/}).
   \item Ansible inventory: \texttt{ansible/inventory/hosts.ini}
   \item Jenkins pipeline script: \texttt{Jenkinsfile}
@@ -257,21 +256,21 @@ The figures below showcase core artefacts captured during the project.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.85\linewidth]{../screenshots/ui-home.png}
+  \includegraphics[width=0.85\linewidth]{../../screenshots/ui-home.png}
   \caption{Scientific calculator UI demonstrating square root, factorial, logarithm, and power operations.}
   \label{fig:ui}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.85\linewidth]{../screenshots/ci-pipeline.png}
+  \includegraphics[width=0.85\linewidth]{../../screenshots/ci-pipeline.png}
   \caption{Jenkins pipeline stage view highlighting the passing Install, Test, Build, Docker, and Ansible stages.}
   \label{fig:pipeline}
 \end{figure}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.85\linewidth]{../screenshots/ansible-deploy.png}
+  \includegraphics[width=0.85\linewidth]{../../screenshots/ansible-deploy.png}
   \caption{Ansible play recap from Jenkins showing the container restart with host port realignment.}
   \label{fig:ansible}
 \end{figure}
