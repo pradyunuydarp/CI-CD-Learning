@@ -72,14 +72,15 @@ pipeline {
             string(credentialsId: 'ANSIBLE_VAULT_PASS', variable: 'ANSIBLE_VAULT_PASS')
           ]) {
             withEnv([
-              "DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}",
-              "ANSIBLE_PYTHON_INTERPRETER=../.venv/bin/python"
+              "DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}"
             ]) {
               sh '''
                 set -eux
                 python3 -m venv .venv
-                . .venv/bin/activate
-                pip install --upgrade pip ansible
+                VENV_PATH="$(pwd)/.venv"
+                . "$VENV_PATH/bin/activate"
+                pip install --upgrade pip ansible docker
+                export ANSIBLE_PYTHON_INTERPRETER="$VENV_PATH/bin/python"
                 cd ansible
                 ansible-galaxy collection install -r requirements.yml
                 trap 'rm -f .vault_pass.txt' EXIT

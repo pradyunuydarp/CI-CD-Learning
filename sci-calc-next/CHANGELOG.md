@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-10-10
+- Ensured the Jenkins Ansible deploy stage exports the absolute virtualenv interpreter so Docker modules resolve during deployment.
+- Documented the pipeline fix in the CI/CD report.
+
+Author: CDX
+
 ## [0.3.0] - 2025-10-10
 - Finalised the Ansible layout with config, inventory, group vars, and dedicated ping/deploy playbooks.
 - Added a vault credential template plus supporting ignore rules for local vault password files.
