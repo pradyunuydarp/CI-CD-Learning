@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2025-10-10
+- Added the student's roll number (IMT2022525) and IIITB email contact to the report title block.
+- Recompiled the PDF so the cover now reflects the updated author metadata.
+
+Author: CDX
+
 ## [0.3.7] - 2025-10-10
 - Forced a pagination break after Appendix B so the screenshot gallery renders before the command reference in the PDF.
 - Regenerated the LaTeX artefact to confirm the revised float placement.
