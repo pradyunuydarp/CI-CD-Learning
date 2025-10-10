@@ -12,41 +12,81 @@
 \maketitle
 
 \section{Introduction}
-This report documents the implementation of the SciCalc Next scientific calculator application and its accompanying DevOps pipeline. It summarises the project scope, tooling, and the automation built to support repeatable delivery.
+SciCalc Next is the scientific calculator that supports the SPE Mini Project. The goal was to deliver four advanced operations, wrap the logic inside a Next.js interface, and prove a complete CI/CD story from local code all the way to an Ansible driven deployment. This document keeps the wording simple and tracks each artefact we produced while following the brief in \textit{SPE -- Mini Project Instructions.pdf}.
 
 \section{Setup and Architecture}
 \begin{itemize}[leftmargin=*]
-  \item Frontend built with Next.js 15 (App Router) and TypeScript.
-  \item Domain logic implemented in a dedicated \texttt{src/lib} module for reuse across API routes and unit tests.
-  \item Client UI delivered through a revitalised calculator workspace with expression parsing, quick-operation toggles, and clipboard support.
-  \item Visual styling leverages a glassmorphic theme, responsive panel/sidebar layout, and semantic labelling for improved accessibility.
+  \item Next.js 15 with the App Router powers the UI. Pages live under \texttt{src/app}; reusable UI pieces sit in \texttt{src/components}.
+  \item All maths lives in \texttt{src/lib/math.ts}. The module exports \texttt{sqrtX}, \texttt{factX}, \texttt{lnX}, and \texttt{power}, matching the operations listed in the assignment.
+  \item The calculation API is exposed at \texttt{src/app/api/calc/route.ts}. The client form sends one payload to this route, keeping validation in one place.
+  \item Global layout is defined in \texttt{src/app/layout.tsx}. Styling sticks to flex layouts so the screen reads well on laptops and tablets.
 \end{itemize}
 
-\section{CI/CD Implementation}
+\section{Requirement Coverage}
+Each item from the mini project checklist is satisfied as follows:
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Scientific operations} --- factorial, square root, natural log, and exponentiation are exposed in the UI and API. Invalid inputs (negative factorials, zero logarithms, empty bases) return clear error messages.
+  \item \textbf{Automated tests} --- Vitest specs under \texttt{src/lib/math.test.ts} cover happy paths and edge cases. They run through \texttt{npm run test} and are wired into Jenkins.
+  \item \textbf{Quality gates} --- ESLint runs through \texttt{npm run lint}. Prettier is ready through \texttt{npm run format}. These scripts close the testing and linting requirement.
+  \item \textbf{Containerisation} --- The multi-stage Dockerfile builds the Next.js output and runs it inside a slim Node 20 Alpine image. Local developers can run \texttt{docker build -t sci-calc-next:dev .}.
+  \item \textbf{Continuous integration} --- Jenkins executes install, lint, test, build, and Docker push stages. Docker Hub and Vault credentials are stored as Jenkins secrets, satisfying the secure credentials requirement.
+  \item \textbf{Continuous delivery} --- Ansible playbooks live under \texttt{ansible/}. The deploy playbook pulls the pushed image and keeps the container running on port 3000.
+  \item \textbf{Documentation} --- This report, the change log, README, and ANSIBLE guide are updated after each milestone, meeting the reporting expectation.
+\end{enumerate}
+
+\section{Automated Testing}
 \begin{itemize}[leftmargin=*]
-  \item Declarative Jenkins pipeline orchestrates installation, linting, testing, and creation of the production build.
-  \item The Docker stage authenticates with Docker Hub using managed credentials before building and pushing `sci-calc-next:latest`.
-  \item A dedicated \texttt{Ansible Deploy} stage provisions an ephemeral virtual environment, installs Galaxy collections, and runs the deploy playbook with a vault-sourced password file.
+  \item \textbf{Unit tests} --- \texttt{npm run test} executes Vitest in CI. Any failure blocks the Docker build stage.
+  \item \textbf{Static analysis} --- \texttt{npm run lint} enforces the Next.js ESLint preset. The job prints the deprecation warning about `next lint` so the team can plan a migration.
+  \item \textbf{Repeatable installs} --- \texttt{npm ci} runs in every pipeline, guaranteeing the lockfile controls dependency state.
+\end{itemize}
+
+\section{CI/CD Pipeline}
+\begin{itemize}[leftmargin=*]
+  \item Jenkins pulls the repository, runs the scripts above, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
+  \item The Docker stage logs which user is in use, logs into Docker Hub, builds \texttt{<user>/sci-calc-next:latest}, and pushes it.
+  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}.
 \end{itemize}
 
 \section{Docker and Ansible Deployment}
 \begin{itemize}[leftmargin=*]
-  \item Multi-stage Dockerfile emits a slim runtime image rooted in \texttt{node:20-alpine}.
-  \item The Ansible tree now includes \texttt{ansible.cfg}, an inventory, shared group variables, and targeted playbooks in \texttt{playbooks/}.
-  \item \texttt{playbooks/ping.yml} validates host reachability before any container changes are attempted.
-  \item \texttt{playbooks/deploy.yml} logs into Docker Hub when credentials are present, pulls the selected image, and ensures the container binds port 3000 with `NODE\_ENV=production`.
+  \item \textbf{Inventory} --- \texttt{ansible/inventory/hosts.ini} targets localhost but can be extended with remote hosts.
+  \item \textbf{Group vars} --- \texttt{ansible/group_vars/all.yml} holds the Docker image tag and port mapping. Environment variables override defaults for staging or production runs.
+  \item \textbf{Vault} --- \texttt{ansible/vault/secrets.yml} (encrypted) stores Docker Hub credentials. The repo ignores \texttt{.vault\_pass.txt} so secrets stay local.
+  \item \textbf{Playbooks} --- \texttt{playbooks/ping.yml} checks connectivity. \texttt{playbooks/deploy.yml} logs in, pulls, and manages the container with the \texttt{always} restart policy without requiring sudo access.
 \end{itemize}
 
-\section{Results and Screenshots}
-The redesigned interface surfaces contextual guidance, responsive layouts, and clipboard-enabled results. Captured UI previews are tracked under \texttt{../screenshots/} for auditability:
+\section{Results and Evidence}
 \begin{itemize}[leftmargin=*]
-  \item Screenshot 2025-09-30 at 21.03.48 --- dark theme overview of the calculator shell.
-  \item Screenshot 2025-09-30 at 21.10.27 --- expression parsing and quick action controls in use.
-  \item Screenshot 2025-09-30 at 21.11.19 --- factorial input validation state.
-  \item Screenshot 2025-09-30 at 21.50.52 --- result panel with copy feedback messaging.
+  \item Latest Docker push digest: \texttt{\langle paste digest from Jenkins here \rangle}.
+  \item Deployment recap: \texttt{\langle paste Ansible summary here \rangle}.
+  \item Commands to reproduce locally: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, \texttt{ansible-playbook playbooks/deploy.yml}.
 \end{itemize}
+
+\noindent Placeholder screenshots (replace the filenames with real captures once collected):
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../screenshots/ui-home.png}
+  \caption{Calculator home screen --- replace with the latest UI capture.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../screenshots/ci-pipeline.png}
+  \caption{Jenkins pipeline overview --- replace with the console summary screenshot.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../screenshots/ansible-deploy.png}
+  \caption{Ansible deploy run --- replace with the Ansible output screenshot.}
+\end{figure}
 
 \section{Learnings and Improvements}
-Expression parsing introduced edge cases around negative factorials and whitespace that are now guarded inside the UI before API submission. Future iterations should add automated UI tests to cover copy-to-clipboard fallbacks and broaden accessibility audits.
+\begin{itemize}[leftmargin=*]
+  \item Input validation reminded us to clamp values early. The UI now blocks negative factorials and exposes friendly errors for log requests.
+  \item Jenkins initially missed devDependencies when `NODE\_ENV` was exported globally, so the pipeline now scopes that setting to the build command only.
+  \item Future work: migrate from `next lint` to the standalone ESLint CLI, cache the Ansible virtual environment in Jenkins, and add Playwright smoke tests for the UI.
+\end{itemize}
 
 \end{document}

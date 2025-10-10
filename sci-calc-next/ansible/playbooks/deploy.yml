@@ -1,7 +1,7 @@
 ---
 - name: Deploy SciCalc Next container
   hosts: targets
-  become: true
+  gather_facts: false
   collections:
     - community.docker
   pre_tasks:

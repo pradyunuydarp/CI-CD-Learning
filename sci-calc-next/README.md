@@ -38,7 +38,7 @@ The `ansible/` directory is self-contained and ships with:
 - `requirements.yml` declaring the `community.docker`, `community.general`, and `ansible.posix` collections
 - `group_vars/all.yml` for shared defaults such as the Docker image, container name, and ports
 - `playbooks/ping.yml` for quick connectivity checks
-- `playbooks/deploy.yml` that pulls and runs the published container on port 3000
+- `playbooks/deploy.yml` that pulls and runs the published container on port 3000 without requiring sudo (runs as the current Docker-enabled user)
 - `vault/secrets.yml` template bound for `ansible-vault` encryption (Docker Hub credentials)
 
 Typical flow:

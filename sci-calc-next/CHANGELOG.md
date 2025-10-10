@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added a vault credential template plus supporting ignore rules for local vault password files.
 - Refreshed README and ANSIBLE guidance to describe the end-to-end deployment flow.
 - Tuned CI pipeline to run inside the project workspace, force production builds, and invoke the Ansible deploy stage on every run.
+- Updated the Ansible deploy playbook to run without sudo, keeping Jenkins and local runs simple.
 
 Author: CDX
 

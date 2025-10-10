@@ -76,7 +76,7 @@ Connectivity smoke test:
 ansible-playbook playbooks/ping.yml
 ```
 
-Deploy (pulls the image, logs into Docker Hub if credentials exist, and runs the container on port 3000):
+    Deploy (pulls the image, logs into Docker Hub if credentials exist, and runs the container on port 3000 without sudo):
 ```bash
 ansible-playbook playbooks/deploy.yml
 ```
