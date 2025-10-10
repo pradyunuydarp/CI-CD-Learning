@@ -206,6 +206,17 @@ The deploy playbook removes stale containers, pulls the requested image, and rec
 During the successful Jenkins run, the play recap reported \texttt{ok=3 changed=1 failed=0}, confirming the container restart on the new port.
 
 \section{Application Experience}
+\subsection*{User Journey}
+Landing on \texttt{/} presents a centered glassmorphism shell with the "SciCalc Next" banner and a two-column layout on desktop. The left pane hosts the interactive form: four quick-action pills switch between square root, factorial, natural logarithm, and power, while an optional free-form expression box accepts inputs such as \texttt{5!}, \texttt{sqrt(144)}, \texttt{ln(10)}, or \texttt{pow(2,8)}. Selecting an operation swaps in the relevant structured fields (single numeric input for unary functions, paired base/exponent inputs for power) so the user can either type shorthand math or rely on labelled controls.
+
+\subsection*{Feedback Loop}
+Submitting the form issues a \texttt{POST} to \texttt{/api/calc}, which validates the payload and runs the math helpers. Results appear instantly in the right-hand "Result preview" card, formatted with up to six decimal places and wrapped in a scrollable badge for long outputs. A single click copies the numeric answer to the clipboard and surfaces a transient "Copied!" indicator; unsupported clipboard environments fall back to an inline warning instead of failing silently.
+
+\subsection*{Guidance and Validation}
+Each operation tile advertises its domain (e.g., factorial highlights non-negative integers, logarithm warns about positive inputs only), and the sidebar mirrors the currently selected operation with a description and worked example. Client-side parsing catches malformed expressions before the request leaves the browser, while the API raises explicit error messages for domain breaches such as negative square roots or overflowing factorials. These messages render in the sidebar with accentuated error styling, ensuring users understand why a computation failed.
+
+\subsection*{Responsiveness and Accessibility}
+The grid collapses to a single column below 960~px, keeping the keypad, inputs, and feedback stacked for mobile reachability. Buttons expose \texttt{aria-pressed} state, results live in an \texttt{aria-live} region, and focus-visible styles ensure keyboard navigation remains clear. Color contrast between foreground text and the dark background exceeds WCAG~AA targets, making the calculator legible in low-light settings.
 \section{Runtime Access}
 A secure tunnel is exposed through ngrok during local demos so remote reviewers can reach the calculator without opening firewall ports.
 

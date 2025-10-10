@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2025-10-10
+- Populated the report's Application Experience section with end-user journey, feedback, validation, and accessibility details.
+- Regenerated the LaTeX artefact with Tectonic so the updated narrative ships in `docs/report.pdf`.
+
+Author: CDX
+
 ## [0.3.5] - 2025-10-10
 - Taught the Jenkins install stage to remove any leftover node_modules directory before running npm ci, preventing ENOTEMPTY errors on the agent workspace.
 - Rebuilt the project report to cover the complete assignment brief, detailed pipeline walkthrough, configuration snippets, and screenshot gallery guidance.
