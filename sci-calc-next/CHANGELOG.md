@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.7] - 2025-10-10
+- Forced a pagination break after Appendix B so the screenshot gallery renders before the command reference in the PDF.
+- Regenerated the LaTeX artefact to confirm the revised float placement.
+
+Author: CDX
+
 ## [0.3.6] - 2025-10-10
 - Populated the report's Application Experience section with end-user journey, feedback, validation, and accessibility details.
 - Regenerated the LaTeX artefact with Tectonic so the updated narrative ships in `docs/report.pdf`.
