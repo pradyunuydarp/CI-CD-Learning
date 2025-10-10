@@ -2,8 +2,6 @@ pipeline {
   agent any
 
   environment {
-    NODE_ENV = 'development'
-    DOCKER_IMAGE = 'sci-calc-next:latest'
     PATH = "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
   }
 
@@ -15,65 +13,77 @@ pipeline {
   stages {
     stage('Install') {
       steps {
-        sh 'node -v'
-        sh 'npm ci'
+        dir('sci-calc-next') {
+          sh 'node -v'
+          sh 'npm ci'
+        }
       }
     }
 
     stage('Test') {
       steps {
-        sh 'npm run lint'
-        sh 'npm run test'
+        dir('sci-calc-next') {
+          sh 'npm run lint'
+          sh 'npm run test'
+        }
       }
     }
 
     stage('Build') {
       steps {
-        sh 'npm run build'
+        dir('sci-calc-next') {
+          sh 'NODE_ENV=production npm run build'
+        }
       }
     }
 
     stage('Docker Build & Push') {
       steps {
-        script {
-          withCredentials([
-            usernamePassword(
-              credentialsId: 'dockerhub',
-              usernameVariable: 'DOCKERHUB_USER',
-              passwordVariable: 'DOCKERHUB_TOKEN'
-            )
-          ]) {
-            env.DOCKER_IMAGE = "${DOCKERHUB_USER}/sci-calc-next:latest"
-            sh '''
-              set -eux
-              echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
-              docker build -t "$DOCKER_IMAGE" .
-              docker push "$DOCKER_IMAGE"
-              docker logout
-            '''
+        dir('sci-calc-next') {
+          script {
+            withCredentials([
+              usernamePassword(
+                credentialsId: 'dockerhub',
+                usernameVariable: 'DOCKERHUB_USER',
+                passwordVariable: 'DOCKERHUB_TOKEN'
+              )
+            ]) {
+              def image = "${DOCKERHUB_USER}/sci-calc-next:latest"
+              env.DOCKER_IMAGE = image
+              sh """
+                #!/bin/bash
+                set -eux
+                echo "Using Docker Hub user: ${DOCKERHUB_USER}"
+                echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+                docker build -t "${image}" .
+                docker push "${image}"
+                docker logout
+              """
+            }
           }
         }
       }
     }
 
     stage('Ansible Deploy') {
-      when { branch 'main' }
       steps {
-        withCredentials([
-          string(credentialsId: 'ANSIBLE_VAULT_PASS', variable: 'ANSIBLE_VAULT_PASS')
-        ]) {
-          withEnv(["DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}"]) {
-            sh '''
-              set -eux
-              python3 -m venv .venv
-              . .venv/bin/activate
-              pip install --upgrade pip ansible
-              cd ansible
-              ansible-galaxy collection install -r requirements.yml
-              trap 'rm -f .vault_pass.txt' EXIT
-              printf "%s" "$ANSIBLE_VAULT_PASS" > .vault_pass.txt
-              ansible-playbook playbooks/deploy.yml --vault-password-file .vault_pass.txt
-            '''
+        dir('sci-calc-next') {
+          withCredentials([
+            string(credentialsId: 'ANSIBLE_VAULT_PASS', variable: 'ANSIBLE_VAULT_PASS')
+          ]) {
+            withEnv(["DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}"]) {
+              sh '''
+                set -eux
+                python3 -m venv .venv
+                . .venv/bin/activate
+                pip install --upgrade pip ansible
+                cd ansible
+                ansible-galaxy collection install -r requirements.yml
+                trap 'rm -f .vault_pass.txt' EXIT
+                printf "%s" "$ANSIBLE_VAULT_PASS" > .vault_pass.txt
+                ansible-playbook playbooks/deploy.yml --vault-password-file .vault_pass.txt
+              '''
+            }
           }
         }
       }

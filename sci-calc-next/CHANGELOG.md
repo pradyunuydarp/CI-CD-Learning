@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Finalised the Ansible layout with config, inventory, group vars, and dedicated ping/deploy playbooks.
 - Added a vault credential template plus supporting ignore rules for local vault password files.
 - Refreshed README and ANSIBLE guidance to describe the end-to-end deployment flow.
+- Tuned CI pipeline to run inside the project workspace, force production builds, and invoke the Ansible deploy stage on every run.
 
 Author: CDX
 
