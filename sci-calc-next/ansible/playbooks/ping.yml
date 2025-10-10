@@ -1,0 +1,7 @@
+---
+- name: Ping all hosts
+  hosts: targets
+  gather_facts: false
+  tasks:
+    - name: Validate connectivity
+      ansible.builtin.ping:

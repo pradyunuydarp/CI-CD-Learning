@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-10-10
+- Finalised the Ansible layout with config, inventory, group vars, and dedicated ping/deploy playbooks.
+- Added a vault credential template plus supporting ignore rules for local vault password files.
+- Refreshed README and ANSIBLE guidance to describe the end-to-end deployment flow.
+
+Author: CDX
+
 ## [0.2.0] - 2025-09-30
 - Refined the calculator experience with a responsive split layout, thematic styling, and contextual helpers.
 - Added expression parsing, quick operation toggles, and result copy support to streamline advanced use.

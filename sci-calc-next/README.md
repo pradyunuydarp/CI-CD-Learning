@@ -33,17 +33,22 @@ Unit tests live alongside source files under `src/`. The Jenkins pipeline runs l
 - `.dockerignore` excludes local artefacts from the image context.
 
 ## Deployment with Ansible
-The `ansible/` directory contains:
-- `inventory.ini` with a localhost target (adjust as needed)
-- `requirements.yml` pinning the `community.docker` collection
-- `deploy.yml` playbook that pulls and runs the published container on port 3000
+The `ansible/` directory is self-contained and ships with:
+- `ansible.cfg` that pins the inventory at `inventory/hosts.ini`
+- `requirements.yml` declaring the `community.docker`, `community.general`, and `ansible.posix` collections
+- `group_vars/all.yml` for shared defaults such as the Docker image, container name, and ports
+- `playbooks/ping.yml` for quick connectivity checks
+- `playbooks/deploy.yml` that pulls and runs the published container on port 3000
+- `vault/secrets.yml` template bound for `ansible-vault` encryption (Docker Hub credentials)
 
-Run:
+Typical flow:
 ```bash
-ansible-galaxy collection install -r ansible/requirements.yml
-ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+cd ansible
+ansible-galaxy collection install -r requirements.yml
+ansible-playbook playbooks/ping.yml
+ansible-playbook playbooks/deploy.yml  # add --vault-password-file or --ask-vault-pass once encrypted
 ```
-Customise `DOCKER_IMAGE`, `container_name`, or `host_port` using extra vars or environment variables.
+Override the image or host port by exporting `DOCKER_IMAGE` / `HOST_PORT` or by passing `-e` extra vars.
 
 ## Documentation & Reporting
 Project documentation lives in `docs/`. Update `docs/report.tex` after each milestone and regenerate a companion PDF as evidence. Track high-level progress in `CHANGELOG.md` using Conventional Commit checkpoints.

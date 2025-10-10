@@ -23,10 +23,19 @@ This report documents the implementation of the SciCalc Next scientific calculat
 \end{itemize}
 
 \section{CI/CD Implementation}
-The Jenkins pipeline installs dependencies, runs quality gates (linting and unit tests), executes a production build, and publishes a Docker image to Docker Hub. Credentials are injected securely via Jenkins.
+\begin{itemize}[leftmargin=*]
+  \item Declarative Jenkins pipeline orchestrates installation, linting, testing, and creation of the production build.
+  \item The Docker stage authenticates with Docker Hub using managed credentials before building and pushing `sci-calc-next:latest`.
+  \item A dedicated \texttt{Ansible Deploy} stage provisions an ephemeral virtual environment, installs Galaxy collections, and runs the deploy playbook with a vault-sourced password file.
+\end{itemize}
 
 \section{Docker and Ansible Deployment}
-A multi-stage Dockerfile produces a lean runtime image based on \texttt{node:20-alpine}. Ansible playbooks pull the published image and ensure the container remains running with an exposed port of 3000.
+\begin{itemize}[leftmargin=*]
+  \item Multi-stage Dockerfile emits a slim runtime image rooted in \texttt{node:20-alpine}.
+  \item The Ansible tree now includes \texttt{ansible.cfg}, an inventory, shared group variables, and targeted playbooks in \texttt{playbooks/}.
+  \item \texttt{playbooks/ping.yml} validates host reachability before any container changes are attempted.
+  \item \texttt{playbooks/deploy.yml} logs into Docker Hub when credentials are present, pulls the selected image, and ensures the container binds port 3000 with `NODE\_ENV=production`.
+\end{itemize}
 
 \section{Results and Screenshots}
 The redesigned interface surfaces contextual guidance, responsive layouts, and clipboard-enabled results. Captured UI previews are tracked under \texttt{../screenshots/} for auditability:

@@ -1,0 +1,40 @@
+---
+- name: Deploy SciCalc Next container
+  hosts: targets
+  become: true
+  collections:
+    - community.docker
+  pre_tasks:
+    - name: Load vault credentials when available
+      ansible.builtin.include_vars:
+        file: ../vault/secrets.yml
+        optional: true
+
+  tasks:
+    - name: Log in to Docker registry
+      community.docker.docker_login:
+        registry_url: "{{ docker_registry_url }}"
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
+      when:
+        - dockerhub_username is defined
+        - dockerhub_username | length > 0
+        - dockerhub_password is defined
+        - dockerhub_password | length > 0
+
+    - name: Pull SciCalc Next image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Ensure SciCalc Next container is running
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        recreate: true
+        restart_policy: always
+        published_ports:
+          - "{{ host_port }}:{{ container_port }}"
+        env:
+          NODE_ENV: production

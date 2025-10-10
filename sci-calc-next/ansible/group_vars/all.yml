@@ -1,0 +1,7 @@
+---
+app_name: sci-calc-next
+docker_image: "{{ lookup('env', 'DOCKER_IMAGE') | default('dockerhub-user/sci-calc-next:latest', true) }}"
+container_name: sci-calc-next
+container_port: 3000
+host_port: "{{ lookup('env', 'HOST_PORT') | default('3000', true) }}"
+docker_registry_url: docker.io

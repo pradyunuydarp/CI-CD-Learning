@@ -3,148 +3,601 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SciCalc Next Submission</title>
+    <title>SciCalc Next · Submission Dossier</title>
     <style>
       :root {
-        color-scheme: dark;
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #0f141f;
-        color: #f5f9ff;
+        color-scheme: light;
+        --accent: #1c5d99;
+        --accent-soft: #edf3fb;
+        --border: #d6dce4;
+        --text: #1f2a37;
+        --muted: #4b5563;
+        --background: #f5f7fb;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        padding: 3rem 1.5rem 4rem;
-        display: flex;
-        justify-content: center;
+        padding: 2rem;
+        font-family: "Helvetica Neue", Arial, "Segoe UI", sans-serif;
+        background: var(--background);
+        color: var(--text);
+        line-height: 1.6;
       }
+
       main {
-        max-width: 920px;
-        width: 100%;
-        background: rgba(18, 24, 36, 0.9);
+        max-width: 960px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 2.5rem 3rem 3rem;
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-        padding: clamp(2rem, 4vw, 3rem);
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
         display: grid;
-        gap: clamp(1.8rem, 4vw, 2.6rem);
+        gap: 2.5rem;
       }
-      header h1 {
+
+      header {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .tagline {
         margin: 0;
-        font-size: clamp(2rem, 4vw, 2.8rem);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.75rem;
+        color: var(--accent);
+        font-weight: 600;
       }
-      header p {
-        margin: 0.35rem 0 0;
-        color: rgba(255, 255, 255, 0.75);
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4vw, 2.8rem);
+        letter-spacing: -0.02em;
       }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .summary-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .summary-card {
+        padding: 1.2rem 1.4rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--accent-soft);
+      }
+
+      h2 {
+        margin: 0 0 1rem;
+        font-size: 1.5rem;
+        letter-spacing: -0.01em;
+      }
+
+      h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+        letter-spacing: -0.01em;
+      }
+
       section {
         display: grid;
         gap: 1rem;
       }
-      h2 {
-        margin: 0;
-        font-size: clamp(1.3rem, 3vw, 1.7rem);
-      }
-      h3 {
-        margin: 0;
-        font-size: 1.1rem;
-      }
-      .muted {
-        color: rgba(255, 255, 255, 0.65);
+
+      p {
         margin: 0;
       }
-      .bullet-list {
+
+      ul {
         margin: 0;
-        padding-left: 1.1rem;
+        padding-left: 1.25rem;
+      }
+
+      li {
+        margin-bottom: 0.35rem;
+      }
+
+      .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+
+      th,
+      td {
+        padding: 0.75rem 0.85rem;
+        border: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--accent-soft);
+        font-weight: 600;
+      }
+
+      code {
+        font-family: "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+        background: #f1f5f9;
+        padding: 0.1rem 0.3rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .callout {
+        border-left: 4px solid var(--accent);
+        padding: 1rem 1.25rem;
+        background: #f8fbff;
+        border-radius: 10px;
+      }
+
+      .grid-two {
         display: grid;
-        gap: 0.4rem;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       }
-      .bullet-list li::marker {
-        color: #4c8bf5;
+
+      .divider {
+        border: 0;
+        border-top: 1px solid var(--border);
+        margin: 0;
       }
-      .artifact-links {
-        display: flex;
-        flex-wrap: wrap;
+
+      .artifact-list {
+        display: grid;
         gap: 0.5rem;
+        font-size: 0.95rem;
       }
-      .artifact-links a {
-        color: #d7e4ff;
-        background: rgba(76, 139, 245, 0.2);
-        border: 1px solid rgba(76, 139, 245, 0.45);
-        padding: 0.45rem 0.9rem;
-        border-radius: 999px;
-        text-decoration: none;
-        transition: background 0.2s ease, border 0.2s ease;
-      }
-      .artifact-links a:hover {
-        background: rgba(76, 139, 245, 0.35);
-        border-color: rgba(76, 139, 245, 0.75);
-      }
-      .screenshot-list {
-        display: grid;
-        gap: 0.4rem;
-        margin: 0;
-        padding-left: 1.1rem;
-      }
-      .screenshot-list a {
-        color: #9ec4ff;
+
+      a {
+        color: var(--accent);
         text-decoration: none;
       }
-      .screenshot-list a:hover {
+
+      a:hover {
         text-decoration: underline;
       }
+
+      .print-break {
+        position: relative;
+      }
+
+      @media screen {
+        .print-break::before {
+          content: " ";
+          position: absolute;
+          top: -1.5rem;
+          left: 0;
+          right: 0;
+          border-top: 1px dashed var(--border);
+        }
+
+        .print-break::after {
+          content: "Next Page";
+          position: absolute;
+          top: -2.35rem;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #fff;
+          padding: 0 0.75rem;
+          font-size: 0.7rem;
+          letter-spacing: 0.25em;
+          color: var(--muted);
+        }
+      }
+
       footer {
         font-size: 0.85rem;
-        color: rgba(255, 255, 255, 0.5);
+        color: var(--muted);
+        border-top: 1px solid var(--border);
+        padding-top: 1rem;
       }
-      footer strong {
-        color: rgba(255, 255, 255, 0.75);
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 0.7in;
+        }
+
+        body {
+          background: #fff;
+          padding: 0;
+        }
+
+        main {
+          box-shadow: none;
+          border: none;
+          padding: 0;
+          gap: 1.5rem;
+          display: block;
+        }
+
+        .summary-card {
+          background: #f6f8fb;
+        }
+
+        a::after {
+          content: " (" attr(href) ")";
+          font-size: 0.8em;
+        }
+
+        header,
+        section,
+        .summary-grid,
+        .summary-card,
+        .table-wrapper {
+          break-inside: avoid;
+        }
+
+        section.print-break {
+          break-before: page;
+          margin-top: 0;
+          padding-top: 0;
+        }
+
+        table {
+          break-inside: auto;
+        }
+
+        thead {
+          display: table-header-group;
+        }
       }
     </style>
   </head>
   <body>
     <main>
       <header>
-        <h1>SciCalc Next Submission</h1>
-        <p>Automatically generated overview of the project deliverables.</p>
+        <p class="tagline">Scientific Calculator · DevOps Delivery</p>
+        <h1>SciCalc Next Submission Dossier</h1>
+        <div class="meta">
+          <span
+            ><strong>Prepared for:</strong> Software Process &amp; Engineering Mini
+            Project</span
+          >
+          <span
+            ><strong>Date:</strong>
+            <time datetime="2025-10-01">1 October 2025</time></span
+          >
+          <span><strong>Author:</strong> Pradyun Devarakonda</span>
+          <span><strong>Release:</strong> v0.2.0</span>
+        </div>
+        <div class="summary-grid">
+          <article class="summary-card">
+            <h3>Application Scope</h3>
+            <p>
+              SciCalc Next delivers square root, factorial, natural logarithm, and
+              exponentiation through a polished Next.js 15 interface backed by typed APIs.
+            </p>
+          </article>
+          <article class="summary-card">
+            <h3>Delivery Footprint</h3>
+            <p>
+              Automated quality gates via Vitest and ESLint, Docker packaging, Jenkins CI,
+              and Ansible-based container rollout to a target host.
+            </p>
+          </article>
+          <article class="summary-card">
+            <h3>Evidence Bundle</h3>
+            <p>
+              Source repository, pipeline definition, deployment playbook, changelog, and
+              printable submission artefacts captured under <code>docs/</code>.
+            </p>
+          </article>
+        </div>
       </header>
+
       <section>
-        <h2>Snapshot</h2>
-        <p class="muted">Generated on <strong>2025-09-30T18:13:56.093Z</strong></p>
+        <h2>Project Overview</h2>
+        <p>
+          SciCalc Next is a scientific calculator web application engineered with Next.js
+          15.5.4, React 19, and TypeScript. The solution exposes a unified calculation API
+          (`src/app/api/calc/route.ts`) that delegates to a typed mathematics library
+          (`src/lib/math.ts`) covering square root, factorial, natural logarithm, and
+          power operations with rigorous input validation. The client UI
+          (`src/components/Calculator.tsx`) offers a responsive, keyboard-friendly
+          workspace to interact with these capabilities.
+        </p>
+        <p>
+          The project emphasises maintainability and auditability. All core logic is
+          unit-tested with Vitest (`src/lib/math.test.ts`), linted via ESLint 9, and
+          formatted with Prettier 3. Developer ergonomics are supported through npm
+          scripts and TypeScript configuration aligned with Next.js App Router best
+          practices.
+        </p>
       </section>
+
+      <section class="print-break">
+        <h2>Architectural Blueprint</h2>
+        <div class="grid-two">
+          <div>
+            <h3>Frontend Delivery</h3>
+            <ul>
+              <li>
+                Next.js App Router structure (`src/app/`) with server components for
+                layout and a client-side `Calculator` widget for interactive input.
+              </li>
+              <li>
+                Global styling defined in `src/app/globals.css` to deliver a
+                high-contrast, accessible experience across desktop and print views.
+              </li>
+              <li>
+                Typed props and state management ensure predictable render flows and
+                reduce runtime regressions.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>Service &amp; Domain Logic</h3>
+            <ul>
+              <li>
+                Mathematics module implements <code>sqrtX</code>, <code>factX</code>,
+                <code>lnX</code>, and <code>power</code> with defensive guards for invalid
+                input and overflow scenarios.
+              </li>
+              <li>
+                API route normalises requests into a discriminated union, reusing the
+                domain module to keep business rules in one place.
+              </li>
+              <li>
+                Explicit error handling returns actionable HTTP 400 responses for
+                unsupported or malformed operations.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid-two">
+          <div>
+            <h3>Quality Assurance</h3>
+            <ul>
+              <li>
+                Vitest suite validates happy paths and edge cases for each mathematical
+                operation and the combined <code>evaluate</code> dispatcher.
+              </li>
+              <li>
+                ESLint (Next.js preset) enforces code quality gates, while Prettier
+                standardises formatting across TypeScript, TSX, JSON, and styling assets.
+              </li>
+              <li>
+                Automated scripts (`npm run lint`, `npm run test`, `npm run build`)
+                provide deterministic checks for the CI pipeline.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>DevOps Toolchain</h3>
+            <ul>
+              <li>
+                Docker multi-stage build (`Dockerfile`) packages the production-ready
+                Next.js server with minimal footprint.
+              </li>
+              <li>
+                Jenkins pipeline (`Jenkinsfile`) orchestrates install, test, build, and
+                push phases with Docker Hub credential management.
+              </li>
+              <li>
+                Ansible playbook (`ansible/playbooks/deploy.yml`) ensures repeatable container
+                deployment using the `community.docker` collection.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <section>
-        <h2>Latest Release</h2>
-<p class="muted">[0.2.0] - 2025-09-30</p>
-<ul class="bullet-list"><li>Refined the calculator experience with a responsive split layout, thematic styling, and contextual helpers.</li>
-<li>Added expression parsing, quick operation toggles, and result copy support to streamline advanced use.</li>
-<li>Documented the refresh with updated screenshots and report notes for traceability.</li>
-<li>Author: CDX</li></ul>
+        <h2>CI/CD Pipeline Walkthrough</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Purpose</th>
+                <th>Representative Commands</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Install</td>
+                <td>
+                  Validate agent prerequisites and establish a clean dependency tree.
+                </td>
+                <td><code>node -v</code><br /><code>npm ci</code></td>
+              </tr>
+              <tr>
+                <td>Test</td>
+                <td>Enforce linting and unit coverage prior to packaging.</td>
+                <td><code>npm run lint</code><br /><code>npm run test</code></td>
+              </tr>
+              <tr>
+                <td>Build</td>
+                <td>Generate the optimised Next.js production bundle.</td>
+                <td><code>npm run build</code></td>
+              </tr>
+              <tr>
+                <td>Docker Build &amp; Push</td>
+                <td>
+                  Assemble and distribute the container image to Docker Hub using the
+                  `dockerhub` credential.
+                </td>
+                <td>
+                  <code>docker build -t "$DOCKERHUB_USER/sci-calc-next:latest" .</code
+                  ><br /><code>docker push "$DOCKERHUB_USER/sci-calc-next:latest"</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Ansible Deploy</td>
+                <td>
+                  Create an isolated Ansible runtime, install Galaxy collections, and
+                  apply the deployment playbook with vault-backed credentials.
+                </td>
+                <td>
+                  <code>python3 -m venv .venv</code><br /><code>ansible-galaxy collection install -r ansible/requirements.yml</code><br /><code>ansible-playbook playbooks/deploy.yml</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout">
+          <strong>Credential Management:</strong> Configure a Jenkins secret of type
+          “Username with password” using the ID <code>dockerhub</code> for Docker Hub
+          pushes, and a Secret Text with ID <code>ANSIBLE_VAULT_PASS</code> so the
+          Ansible stage can hydrate the vault password on demand.
+        </div>
       </section>
+
+      <section class="print-break">
+        <h2>Automated Quality Gates</h2>
+        <ul>
+          <li>
+            <strong>Unit validation:</strong> Six targeted Vitest specs cover
+            deterministic outputs, error pathways (negative roots, non-integer factorial
+            inputs, overflow), and the `evaluate` dispatcher contracts.
+          </li>
+          <li>
+            <strong>Static analysis:</strong> ESLint scans TS/TSX modules with Next.js
+            rules, catching unused imports, unsafe React patterns, and TypeScript
+            inconsistencies before build.
+          </li>
+          <li>
+            <strong>Formatting:</strong> Prettier script maintains consistent whitespace
+            and quotation style across the repository, avoiding diff churn between
+            contributors.
+          </li>
+          <li>
+            <strong>Deterministic installs:</strong> `npm ci` combined with
+            `package-lock.json` stabilises dependency resolution for both local
+            development and pipeline runs.
+          </li>
+        </ul>
+      </section>
+
       <section>
-        <h2>Highlights</h2>
-<ul class="bullet-list"><li>Frontend built with Next.js 15 (App Router) and TypeScript.</li>
-<li>Domain logic implemented in a dedicated `src/lib` module for reuse across API routes and unit tests.</li>
-<li>Client UI delivered through a revitalised calculator workspace with expression parsing, quick-operation toggles, and clipboard support.</li>
-<li>Visual styling leverages a glassmorphic theme, responsive panel/sidebar layout, and semantic labelling for improved accessibility.</li>
-<li>Screenshot 2025-09-30 at 21.03.48 --- dark theme overview of the calculator shell.</li>
-<li>Screenshot 2025-09-30 at 21.10.27 --- expression parsing and quick action controls in use.</li>
-<li>Screenshot 2025-09-30 at 21.11.19 --- factorial input validation state.</li>
-<li>Screenshot 2025-09-30 at 21.50.52 --- result panel with copy feedback messaging.</li></ul>
+        <h2>Containerisation &amp; Deployment</h2>
+        <div class="grid-two">
+          <div>
+            <h3>Docker Image Strategy</h3>
+            <ul>
+              <li>
+                Builder stage installs dependencies and compiles the Next.js application.
+              </li>
+              <li>
+                Runtime stage copies the `.next` output and production dependencies into a
+                slim Node.js base image.
+              </li>
+              <li>
+                Entrypoint executes `next start`, exposing the service on port 3000 for
+                downstream reverse proxies or load balancers.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>Ansible Playbook Highlights</h3>
+            <ul>
+              <li>
+                Inventory targets are defined in `ansible/inventory/hosts.ini`; default
+                configuration operates against localhost with a local connection.
+              </li>
+              <li>
+                `ansible/playbooks/deploy.yml` pulls the tagged Docker image (default:
+                `dockerhub-user/sci-calc-next:latest`) and guarantees the container runs
+                with `restart_policy: always`.
+              </li>
+              <li>
+                Customise the deployment by exporting <code>DOCKER_IMAGE</code> or
+                overriding extra variables (`container_name`, `host_port`).
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p><strong>Operational Runbook:</strong></p>
+        <ol>
+          <li>
+            Install Ansible dependencies:
+            <code>ansible-galaxy collection install -r ansible/requirements.yml</code>.
+          </li>
+          <li>
+            Set the desired Docker image reference (optional):
+            <code>export DOCKER_IMAGE=&lt;registry-user&gt;/sci-calc-next:latest</code>.
+          </li>
+          <li>
+            Execute the deployment:
+            <code>cd ansible &amp;&amp; ansible-playbook playbooks/deploy.yml</code>.
+          </li>
+        </ol>
       </section>
+
+      <section class="print-break">
+        <h2>Results &amp; Evidence</h2>
+        <p>
+          The application renders a responsive calculator workspace with real-time
+          validation. Sample interactions confirm accurate computation of factorial,
+          square root, natural logarithm, and exponential operations, with informative
+          error messaging for invalid inputs.
+        </p>
+        <div class="artifact-list">
+          <span><strong>Key Artefacts:</strong></span>
+          <a href="report.pdf">docs/report.pdf</a>
+          <a href="report.tex">docs/report.tex</a>
+          <a href="../CHANGELOG.md">CHANGELOG.md</a>
+          <a href="../Jenkinsfile">Jenkinsfile</a>
+          <a href="../Dockerfile">Dockerfile</a>
+          <a href="../ansible/playbooks/deploy.yml">ansible/playbooks/deploy.yml</a>
+        </div>
+        <p>
+          Additional screenshots documenting UI flows are available under the repository’s
+          <code>screenshots/</code> directory.
+        </p>
+      </section>
+
       <section>
-        <h2>Artifacts</h2>
-<div class="artifact-links">
-  <a href="report.pdf">Report PDF</a>
-  <a href="report.tex">Report LaTeX</a>
-  <a href="../CHANGELOG.md">CHANGELOG</a>
-</div>
-<h3>UI Evidence</h3>
-<ul class="screenshot-list">  <li><a href="../../screenshots/Screenshot 2025-09-30 at 21.03.48.png">Screenshot 2025-09-30 at 21.03.48.png</a></li>
-  <li><a href="../../screenshots/Screenshot 2025-09-30 at 21.10.27.png">Screenshot 2025-09-30 at 21.10.27.png</a></li>
-  <li><a href="../../screenshots/Screenshot 2025-09-30 at 21.11.19.png">Screenshot 2025-09-30 at 21.11.19.png</a></li>
-  <li><a href="../../screenshots/Screenshot 2025-09-30 at 21.50.52.png">Screenshot 2025-09-30 at 21.50.52.png</a></li></ul>
+        <h2>Future Enhancements</h2>
+        <ul>
+          <li>
+            Extend the API with additional scientific operations (trigonometric,
+            logarithmic bases) while preserving strict validation.
+          </li>
+          <li>
+            Introduce integration tests covering API-to-UI flows using Playwright within
+            the Jenkins pipeline.
+          </li>
+          <li>
+            Parameterise the Jenkins pipeline for multi-environment deployments
+            (dev/stage/prod) with gated approvals.
+          </li>
+          <li>
+            Publish live uptime and performance metrics by integrating container health
+            checks and Prometheus exporters.
+          </li>
+        </ul>
       </section>
+
+      <hr class="divider" />
+
       <footer>
-        <p><strong>Note:</strong> Re-run <code>npm run report:submission</code> after major updates to refresh this document.</p>
+        <p>
+          This submission dossier is intended for printing from any standards-compliant
+          browser. Rebuild it after major milestones with
+          <code>npm run report:submission</code> to ensure the summary stays current.
+        </p>
       </footer>
     </main>
   </body>
