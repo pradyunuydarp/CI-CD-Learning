@@ -29,7 +29,7 @@ ansible/
   ansible.cfg
   requirements.yml
   inventory/hosts.ini
-  group_vars/all.yml
+  inventory/group_vars/all.yml
   vault/secrets.yml
   playbooks/
     ping.yml
@@ -38,13 +38,13 @@ ansible/
 ```
 - `ansible.cfg` pins the inventory, roles, and collection paths.
 - `inventory/hosts.ini` targets `localhost` by default; extend it with remote hosts as needed.
-- `group_vars/all.yml` defines shared defaults such as the Docker image, container name, and ports (with environment-variable overrides for `DOCKER_IMAGE` and `HOST_PORT`).
+- `inventory/group_vars/all.yml` defines shared defaults such as the Docker image, container name, and ports (with environment-variable overrides for `DOCKER_IMAGE` and `HOST_PORT`).
 - `vault/secrets.yml` is a template file for Docker Hub credentials—encrypt it with `ansible-vault` before committing secrets.
 
 ---
 
 ## 3. Variables & Secrets
-1. Update `ansible/group_vars/all.yml` if you need different defaults.
+1. Update `ansible/inventory/group_vars/all.yml` if you need different defaults.
 2. Populate `ansible/vault/secrets.yml`:
    ```yaml
    dockerhub_username: "your_dockerhub_user"

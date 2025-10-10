@@ -51,7 +51,7 @@ Each item from the mini project checklist is satisfied as follows:
 \section{Docker and Ansible Deployment}
 \begin{itemize}[leftmargin=*]
   \item \textbf{Inventory} --- \texttt{ansible/inventory/hosts.ini} targets localhost but can be extended with remote hosts.
-  \item \textbf{Group vars} --- \texttt{ansible/group_vars/all.yml} holds the Docker image tag and port mapping. Environment variables override defaults for staging or production runs.
+  \item \textbf{Group vars} --- \texttt{ansible/inventory/group\_vars/all.yml} holds the Docker image tag and port mapping. Environment variables override defaults for staging or production runs.
   \item \textbf{Vault} --- \texttt{ansible/vault/secrets.yml} (encrypted) stores Docker Hub credentials. The repo ignores \texttt{.vault\_pass.txt} so secrets stay local.
   \item \textbf{Playbooks} --- \texttt{playbooks/ping.yml} checks connectivity. \texttt{playbooks/deploy.yml} logs in, pulls, and manages the container with the \texttt{always} restart policy without requiring sudo access.
 \end{itemize}
