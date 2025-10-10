@@ -3,6 +3,9 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{enumitem}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
 
 \title{SciCalc Next CI/CD Report}
 \author{Pradyun Devarakonda}
@@ -11,53 +14,78 @@
 \begin{document}
 \maketitle
 
-\section{Introduction}
-SciCalc Next is the scientific calculator that supports the SPE Mini Project. The goal was to deliver four advanced operations, wrap the logic inside a Next.js interface, and prove a complete CI/CD story from local code all the way to an Ansible driven deployment. This document keeps the wording simple and tracks each artefact we produced while following the brief in \textit{SPE -- Mini Project Instructions.pdf}.
+\section{DevOps Overview}
+\subsection*{What and Why}
+DevOps is the practice of combining software development and operations so that product increments can reach users quickly and safely. For this project, DevOps bridges the scientific calculator codebase and the deployment host: every change moves from Git commits through automated tests, container builds, image pushes, and finally to an Ansible-managed runtime. Automating these feedback loops reduces manual effort, ensures reproducibility, and keeps the calculator available.
 
-\section{Setup and Architecture}
+\subsection*{Toolchain Summary}
 \begin{itemize}[leftmargin=*]
-  \item Next.js 15 with the App Router powers the UI. Pages live under \texttt{src/app}; reusable UI pieces sit in \texttt{src/components}.
-  \item All maths lives in \texttt{src/lib/math.ts}. The module exports \texttt{sqrtX}, \texttt{factX}, \texttt{lnX}, and \texttt{power}, matching the operations listed in the assignment.
-  \item The calculation API is exposed at \texttt{src/app/api/calc/route.ts}. The client form sends one payload to this route, keeping validation in one place.
-  \item Global layout is defined in \texttt{src/app/layout.tsx}. Styling sticks to flex layouts so the screen reads well on laptops and tablets.
+  \item \textbf{GitHub} --- central source control for the repository (\href{https://github.com/pradyunuydarp/CI-CD-Learning}{CI-CD-Learning}) and pull-request history.
+  \item \textbf{Node.js 20 \& Next.js 15} --- application runtime and framework powering the web UI.
+  \item \textbf{TypeScript \& ESLint} --- static typing and linting to catch issues before runtime.
+  \item \textbf{Vitest} --- unit testing harness for the calculator logic.
+  \item \textbf{Jenkins} --- orchestrates the CI pipeline across install, test, build, container, and deploy stages.
+  \item \textbf{Docker} --- packages the Next.js application into a portable image.
+  \item \textbf{Docker Hub} --- hosts the pushed image under \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next}{pradyunuydarp/sci-calc-next}.
+  \item \textbf{Ansible} --- pulls the published image and manages the running container on the deployment target.
+  \item \textbf{Ansible Vault} --- stores Docker Hub credentials for production pulls.
+  \item \textbf{LaTeX} --- renders this report as a PDF artefact for submission.
 \end{itemize}
 
-\section{Requirement Coverage}
-Each item from the mini project checklist is satisfied as follows:
-\begin{enumerate}[leftmargin=*]
-  \item \textbf{Scientific operations} --- factorial, square root, natural log, and exponentiation are exposed in the UI and API. Invalid inputs (negative factorials, zero logarithms, empty bases) return clear error messages.
-  \item \textbf{Automated tests} --- Vitest specs under \texttt{src/lib/math.test.ts} cover happy paths and edge cases. They run through \texttt{npm run test} and are wired into Jenkins.
-  \item \textbf{Quality gates} --- ESLint runs through \texttt{npm run lint}. Prettier is ready through \texttt{npm run format}. These scripts close the testing and linting requirement.
-  \item \textbf{Containerisation} --- The multi-stage Dockerfile builds the Next.js output and runs it inside a slim Node 20 Alpine image. Local developers can run \texttt{docker build -t sci-calc-next:dev .}.
-  \item \textbf{Continuous integration} --- Jenkins executes install, lint, test, build, and Docker push stages. Docker Hub and Vault credentials are stored as Jenkins secrets, satisfying the secure credentials requirement.
-  \item \textbf{Continuous delivery} --- Ansible playbooks live under \texttt{ansible/}. The deploy playbook pulls the pushed image and keeps the container running on port 3000.
-  \item \textbf{Documentation} --- This report, the change log, README, and ANSIBLE guide are updated after each milestone, meeting the reporting expectation.
-\end{enumerate}
-
-\section{Automated Testing}
+\section{System Architecture}
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Unit tests} --- \texttt{npm run test} executes Vitest in CI. Any failure blocks the Docker build stage.
-  \item \textbf{Static analysis} --- \texttt{npm run lint} enforces the Next.js ESLint preset. The job prints the deprecation warning about `next lint` so the team can plan a migration.
-  \item \textbf{Repeatable installs} --- \texttt{npm ci} runs in every pipeline, guaranteeing the lockfile controls dependency state.
+  \item Next.js App Router renders the UI under \texttt{src/app}. The main calculator form is implemented in \texttt{src/components/Calculator.tsx} and rendered by \texttt{src/app/page.tsx}.
+  \item Computations live in \texttt{src/lib/math.ts} with exported helpers \texttt{sqrtX}, \texttt{factX}, \texttt{lnX}, and \texttt{power}. Input validation guards edge cases (negative factorials, non-positive logarithm operands, etc.).
+  \item API requests hit \texttt{src/app/api/calc/route.ts}, which accepts JSON payloads, validates the requested operation, and delegates to the math helpers.
+  \item Styling relies on utility classes to keep the layout responsive across laptops and tablets.
 \end{itemize}
 
-\section{CI/CD Pipeline}
-\begin{itemize}[leftmargin=*]
-  \item Jenkins pulls the repository, wipes any stale \texttt{node\_modules} directory, runs \texttt{npm ci}, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
-  \item The Docker stage logs which user is in use, logs into Docker Hub, builds \texttt{<user>/sci-calc-next:latest}, and pushes it.
-  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, picks an open host port (preferring 3000 but falling back when busy), decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}. When the pipeline finishes it sends HTML email notifications on success or failure whenever `NOTIFY\_EMAILS` is populated.
-\end{itemize}
+\section{Implementation Walkthrough}
+\subsection{Source Control Management (GitHub)}
+The project lives at \href{https://github.com/pradyunuydarp/CI-CD-Learning}{github.com/pradyunuydarp/CI-CD-Learning}. The \texttt{sci-calc-next} directory is the Next.js workspace. Typical commands:
+\begin{verbatim}
+# clone
+$ git clone https://github.com/pradyunuydarp/CI-CD-Learning.git
+$ cd CI-CD-Learning/sci-calc-next
 
-\section{Docker and Ansible Deployment}
-\begin{itemize}[leftmargin=*]
-  \item \textbf{Inventory} --- \texttt{ansible/inventory/hosts.ini} targets localhost but can be extended with remote hosts.
-  \item \textbf{Group vars} --- \texttt{ansible/inventory/group\_vars/all.yml} holds the Docker image tag, port defaults, and wires `ANSIBLE\_PYTHON\_INTERPRETER` to the Jenkins virtual environment value the pipeline exports after building its venv.
-  \item \textbf{Cleanup + Vault} --- \texttt{ansible/vault/secrets.yml} (encrypted) stores Docker Hub credentials while the deploy playbook now stops and removes any stale container before recreating it with the resolved host port, ensuring we never conflict with an older run.
-  \item \textbf{Playbooks} --- \texttt{playbooks/ping.yml} checks connectivity. \texttt{playbooks/deploy.yml} logs in, pulls, and manages the container with the \texttt{always} restart policy without requiring sudo access.
-\end{itemize}
+# create feature branch, then commit
+$ git checkout -b feat/new-capability
+$ git add src/app/page.tsx
+$ git commit -m "feat(ui): surface factorial operation"
+$ git push origin feat/new-capability
+\end{verbatim}
+Jenkins tracks the \texttt{main} branch via a GitHub webhook, so every push schedules a pipeline run automatically.
 
-\section{Key Configuration Snippets}
-\subsection*{Jenkins Pipeline Excerpt}
+\subsection{Testing and Quality Gates}
+Unit tests use Vitest and live in \texttt{src/lib/math.test.ts}. Linting enforces Next.js conventions. Both run locally and in CI:
+\begin{verbatim}
+$ npm run lint
+$ npm run test
+\end{verbatim}
+The pipeline stops if either command fails, preventing regressions from reaching Docker build or deployment stages.
+
+\subsection{Build Automation}
+The production bundle is created with the standard Next.js build command:
+\begin{verbatim}
+$ npm run build
+\end{verbatim}
+In Jenkins, the build stage sets \texttt{NODE\_ENV=production} inline for the command so that devDependencies remain available during earlier steps.
+
+\subsection{Continuous Integration with Jenkins}
+The Jenkinsfile orchestrates every step. The Install stage now clears leftover dependencies to avoid \texttt{ENOTEMPTY} errors before running \texttt{npm ci}. Relevant excerpt:
+\begin{verbatim}
+stage('Install') {
+  steps {
+    dir('sci-calc-next') {
+      sh 'node -v'
+      sh 'rm -rf node_modules'
+      sh 'npm ci'
+    }
+  }
+}
+\end{verbatim}
+
+Dynamic host-port detection prevents deploy clashes, and email notifications keep the team informed. The success/failure handlers share build metadata, Docker tag, and the resolved host port:
 \begin{verbatim}
 post {
   success {
@@ -67,7 +95,11 @@ post {
           to: env.NOTIFY_EMAILS,
           subject: "SciCalc Next build #${env.BUILD_NUMBER} succeeded",
           mimeType: 'text/html',
-          body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>\n<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"""
+          body: """
+<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>
+<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>
+Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>
+"""
         )
       }
     }
@@ -80,7 +112,10 @@ post {
           to: env.NOTIFY_EMAILS,
           subject: "SciCalc Next build #${env.BUILD_NUMBER} failed",
           mimeType: 'text/html',
-          body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>\n<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>""",
+          body: """
+<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>
+<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>
+""",
           attachLog: true
         )
       }
@@ -88,8 +123,57 @@ post {
   }
 }
 \end{verbatim}
+During the 10~Oct~2025 run at 16:34 the script detected that port~3000 was occupied, selected 3300 automatically, and completed deployment without manual intervention.
 
-\subsection*{Ansible Deploy Playbook Core}
+\subsection{Containerization}
+The Dockerfile performs a multi-stage build. Key fragment:
+\begin{verbatim}
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+ENV NODE\_ENV=production
+WORKDIR /app
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+RUN npm ci --omit=dev
+EXPOSE 3000
+CMD ["npm", "run", "start"]
+\end{verbatim}
+The Jenkins Docker stage logs into Docker Hub using the \texttt{dockerhub} credential and tags the image as \texttt{pradyunuydarp/sci-calc-next:latest}.
+
+\subsection{Registry Publishing}
+Image publishing relies on native Docker CLI commands executed from Jenkins:
+\begin{verbatim}
+echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+docker build -t "${DOCKERHUB_USER}/sci-calc-next:latest" .
+docker push "${DOCKERHUB_USER}/sci-calc-next:latest"
+docker logout
+\end{verbatim}
+The resulting image is visible under \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next/tags}{Docker Hub tags}.
+
+\subsection{Configuration Management and Deployment}
+Ansible handles the final delivery. Inventory and group variables pin the container name, port mapping, and interpreter:
+\begin{verbatim}
+# ansible/inventory/hosts.ini
+[targets]
+localhost ansible_connection=local
+
+# ansible/inventory/group_vars/all.yml
+app_name: sci-calc-next
+docker_image: "{{ lookup('env', 'DOCKER_IMAGE') | default('pradyunuydarp/sci-calc-next:latest', true) }}"
+container_name: sci-calc-next
+container_port: 3000
+host_port: "{{ lookup('env', 'HOST_PORT') | default('3000', true) }}"
+ansible_python_interpreter: "{{ lookup('env', 'ANSIBLE_PYTHON_INTERPRETER') | default('/usr/bin/env python3', true) }}"
+\end{verbatim}
+
+The deploy playbook removes stale containers, pulls the requested image, and recreates the service:
 \begin{verbatim}
 - name: Stop existing SciCalc Next container
   community.docker.docker_container:
@@ -116,58 +200,109 @@ post {
     env:
       NODE_ENV: production
 \end{verbatim}
+During the successful Jenkins run, the play recap reported \texttt{ok=3 changed=1 failed=0}, confirming the container restart on the new port.
 
-\subsection*{Job Environment Expectations}
-\begin{verbatim}
-# Jenkins job -> Configure -> Pipeline properties
-NOTIFY_EMAILS=alice@example.com,bob@example.com
-
-# Docker image is exported by the pipeline after the push stage
-# Host port is dynamically set before running Ansible
-\end{verbatim}
-
-\section{Results and Evidence}
+\section{Application Experience}
 \begin{itemize}[leftmargin=*]
-  \item Latest Docker push digest: pending next Jenkins run after the interpreter fix.
-  \item Deployment recap: Ansible now frees any stale container, selects an available host port automatically, and is expected to recreate the service on the next Jenkins rerun (the interpreter issue is already fixed).
-  \item Commands to reproduce locally: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, \texttt{ansible-playbook playbooks/deploy.yml}.
-  \item Notification recap: Jenkins emails the addresses in `NOTIFY\_EMAILS` after each run, sharing the build URL, Docker image tag, and resolved host port.
-  \item Documentation recap: This report now embeds the core Jenkins/Ansible snippets and includes an appendix where we can paste the latest instructions and screenshots.
+  \item Users select one of four operations (square root, factorial, natural logarithm, exponentiation) and enter operands. Validation feedback appears inline beneath the form.
+  \item Results are rendered alongside the input panel, with formatting that distinguishes success, domain errors, and invalid requests.
+  \item API throttling is avoided by executing calculations on the server via the \texttt{/api/calc} route, enabling consistent behaviour between local runs and containerised deployments.
+\end{itemize}
+Figure~\ref{fig:ui} illustrates the interface with multiple operations executed during manual testing.
+
+\section{Results and Verification}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Automated tests}: \texttt{npm run test} and \texttt{npm run lint} are executed locally and inside Jenkins. Both passed before the most recent push.
+  \item \textbf{Pipeline completion}: The 10~Oct~2025 16:34 IST Jenkins run completed every stage, published the Docker image, and redeployed via Ansible using host port 3300.
+  \item \textbf{Runtime check}: On the deployment host, \texttt{docker ps --filter name=sci-calc-next --format '{\{\{.Ports\}\}}'} shows the chosen port mapping (for example \texttt{0.0.0.0:3300->3000/tcp}).
+  \item \textbf{Local reproduction}: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, and \texttt{ansible-playbook playbooks/deploy.yml} reproduce the pipeline sequence offline.
 \end{itemize}
 
-\section{Appendix: Paste-In Artefacts}
-\subsection*{Original Instructions}
-\begin{verbatim}
-<<< Paste the latest brief or requirement set here so the document stays self-contained. >>>
-\end{verbatim}
+\section{References and Access}
+\begin{itemize}[leftmargin=*]
+  \item GitHub repository: \href{https://github.com/pradyunuydarp/CI-CD-Learning}{https://github.com/pradyunuydarp/CI-CD-Learning}
+  \item Docker Hub image: \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next}{https://hub.docker.com/r/pradyunuydarp/sci-calc-next}
+  \item Jenkins job: hosted on the local Jenkins master (\texttt{https://<jenkins-host>/job/SciCalc/}).
+  \item Ansible inventory: \texttt{ansible/inventory/hosts.ini}
+  \item Jenkins pipeline script: \texttt{Jenkinsfile}
+  \item Dockerfile: \texttt{Dockerfile}
+\end{itemize}
 
-\subsection*{Screenshot Drop Zone}
-The figure placeholders below are ready for actual assets. Replace the sample paths with your captures or paste additional figures right here.
+\section{Appendix A: Assignment Brief}
+\subsection*{Problem Statement}
+Create a scientific calculator that supports the following operations: square root (\(\sqrt{x}\)), factorial (\(x!\)), natural logarithm (\(\ln x\)), and exponentiation (\(x^b\)). The solution may be a command-line or web application in any programming language.
 
-\noindent Placeholder screenshots (replace the filenames with real captures once collected):
+\subsection*{DevOps Requirements}
+\begin{enumerate}[leftmargin=*]
+  \item Manage the source code with Git on a hosted platform such as GitHub, GitLab, or Bitbucket.
+  \item Implement automated testing (JUnit, Selenium, Vitest, etc.).
+  \item Configure a build step using tools like Maven, Gradle, npm, or equivalents.
+  \item Set up continuous integration with Jenkins.
+  \item Containerise the application with Docker.
+  \item Push the resulting image to Docker Hub.
+  \item Use Ansible for configuration management: pull the image to managed hosts and run the container (local machine or cloud host).
+  \item Document the entire pipeline and provide screenshots demonstrating each stage and calculator functionality.
+\end{enumerate}
+
+\subsection*{Submission Expectations}
+\begin{itemize}[leftmargin=*]
+  \item Report on the DevOps approach, tools, configuration steps, commands, and screenshots of key milestones (Git commits, Jenkins credentials, Docker Hub repository, Ansible execution, and application UI).
+  \item Provide artefacts such as the Dockerfile, Ansible playbooks, Jenkinsfile, and application source code.
+  \item Include links to the public GitHub repository and Docker Hub image in the report.
+  \item Export the final document as PDF named with the roll number.
+\end{itemize}
+
+\section{Appendix B: Screenshot Gallery}
+The figures below showcase core artefacts captured during the project.
+
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.85\linewidth]{../screenshots/ui-home.png}
-  \caption{Calculator home screen --- replace with the latest UI capture.}
+  \caption{Scientific calculator UI demonstrating square root, factorial, logarithm, and power operations.}
+  \label{fig:ui}
 \end{figure}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.85\linewidth]{../screenshots/ci-pipeline.png}
-  \caption{Jenkins pipeline overview --- replace with the console summary screenshot.}
+  \caption{Jenkins pipeline stage view highlighting the passing Install, Test, Build, Docker, and Ansible stages.}
+  \label{fig:pipeline}
 \end{figure}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.85\linewidth]{../screenshots/ansible-deploy.png}
-  \caption{Ansible deploy run --- replace with the Ansible output screenshot.}
+  \caption{Ansible play recap from Jenkins showing the container restart with host port realignment.}
+  \label{fig:ansible}
 \end{figure}
+
+\section{Appendix C: Command Reference}
+\begin{verbatim}
+# Local development
+npm install
+npm run dev
+
+# Quality gates
+npm run lint
+npm run test
+
+# Build and containerise
+npm run build
+docker build -t pradyunuydarp/sci-calc-next:dev .
+
+# Run Ansible locally
+cd ansible
+ansible-playbook playbooks/deploy.yml
+
+# Inspect deployed container
+docker ps --filter name=sci-calc-next --format '{\{\{.Ports\}\}}'
+\end{verbatim}
 
 \section{Learnings and Improvements}
 \begin{itemize}[leftmargin=*]
-  \item Input validation reminded us to clamp values early. The UI now blocks negative factorials and exposes friendly errors for log requests.
-  \item Jenkins initially missed devDependencies when `NODE\_ENV` was exported globally, so the pipeline now scopes that setting to the build command only.
-  \item Future work: migrate from `next lint` to the standalone ESLint CLI, cache the Ansible virtual environment in Jenkins, and add Playwright smoke tests for the UI.
+  \item Automated port detection in Jenkins prevented repeated binding errors once multiple containers were active on the same host.
+  \item Exporting the virtual environment interpreter resolved ``module not found'' issues for \texttt{community.docker} modules.
+  \item Future enhancements include Playwright smoke tests, caching the Ansible virtual environment between Jenkins runs, and promoting tagged releases through a staging environment before production.
 \end{itemize}
 
 \end{document}

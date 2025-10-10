@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.3.5] - 2025-10-10
 - Taught the Jenkins install stage to remove any leftover node_modules directory before running npm ci, preventing ENOTEMPTY errors on the agent workspace.
-- Refreshed the CI/CD report to highlight the cleanup step.
+- Rebuilt the project report to cover the complete assignment brief, detailed pipeline walkthrough, configuration snippets, and screenshot gallery guidance.
 
 Author: CDX
 
