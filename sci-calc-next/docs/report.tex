@@ -45,7 +45,7 @@ Each item from the mini project checklist is satisfied as follows:
 \begin{itemize}[leftmargin=*]
   \item Jenkins pulls the repository, runs the scripts above, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
   \item The Docker stage logs which user is in use, logs into Docker Hub, builds \texttt{<user>/sci-calc-next:latest}, and pushes it.
-  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, picks an open host port (preferring 3000 but falling back when busy), decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}.
+  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, picks an open host port (preferring 3000 but falling back when busy), decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}. When the pipeline finishes it sends HTML email notifications on success or failure whenever `NOTIFY\_EMAILS` is populated.
 \end{itemize}
 
 \section{Docker and Ansible Deployment}
@@ -61,6 +61,7 @@ Each item from the mini project checklist is satisfied as follows:
   \item Latest Docker push digest: pending next Jenkins run after the interpreter fix.
   \item Deployment recap: Ansible now frees any stale container, selects an available host port automatically, and is expected to recreate the service on the next Jenkins rerun (the interpreter issue is already fixed).
   \item Commands to reproduce locally: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, \texttt{ansible-playbook playbooks/deploy.yml}.
+  \item Notification recap: Jenkins emails the addresses in `NOTIFY\_EMAILS` after each run, sharing the build URL, Docker image tag, and resolved host port.
 \end{itemize}
 
 \noindent Placeholder screenshots (replace the filenames with real captures once collected):

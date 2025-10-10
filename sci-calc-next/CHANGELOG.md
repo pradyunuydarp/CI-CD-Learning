@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-10-10
+- Added email notifications to the Jenkins pipeline, driven by the `NOTIFY_EMAILS` environment variable so teams can opt-in per job.
+- Included build metadata and resolved host port in the success message, with console logs attached to failure notices.
+- Updated documentation to describe the notification flow.
+
+Author: CDX
+
 ## [0.3.2] - 2025-10-10
 - Taught the Jenkins deploy stage to probe for a free host port (preferring 3000) before running Ansible and export the selection for the playbook.
 - Added container cleanup pre-tasks so Ansible stops and removes stale deployments before recreating the service, preventing port binding conflicts.

@@ -86,6 +86,7 @@ pipeline {
                 error("No available host ports found from ${candidatePorts.join(', ')}")
               }
               echo "Using host port ${selectedPort} for deployment"
+              env.DEPLOY_HOST_PORT = selectedPort
               withEnv([
                 "DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}",
                 "HOST_PORT=${selectedPort}"
@@ -112,8 +113,34 @@ pipeline {
   }
 
   post {
+    success {
+      script {
+        if (env.NOTIFY_EMAILS?.trim()) {
+          emailext(
+            to: env.NOTIFY_EMAILS,
+            subject: "SciCalc Next build #${env.BUILD_NUMBER} succeeded",
+            mimeType: 'text/html',
+            body: "<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>
+<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>
+Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"
+          )
+        }
+      }
+    }
     failure {
       echo 'Pipeline failed. Review the logs for details.'
+      script {
+        if (env.NOTIFY_EMAILS?.trim()) {
+          emailext(
+            to: env.NOTIFY_EMAILS,
+            subject: "SciCalc Next build #${env.BUILD_NUMBER} failed",
+            mimeType: 'text/html',
+            body: "<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>
+<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>",
+            attachLog: true
+          )
+        }
+      }
     }
   }
 }
