@@ -45,21 +45,21 @@ Each item from the mini project checklist is satisfied as follows:
 \begin{itemize}[leftmargin=*]
   \item Jenkins pulls the repository, runs the scripts above, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
   \item The Docker stage logs which user is in use, logs into Docker Hub, builds \texttt{<user>/sci-calc-next:latest}, and pushes it.
-  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}.
+  \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, picks an open host port (preferring 3000 but falling back when busy), decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}.
 \end{itemize}
 
 \section{Docker and Ansible Deployment}
 \begin{itemize}[leftmargin=*]
   \item \textbf{Inventory} --- \texttt{ansible/inventory/hosts.ini} targets localhost but can be extended with remote hosts.
-  \item \textbf{Group vars} --- \texttt{ansible/inventory/group\_vars/all.yml} holds the Docker image tag, ports, and defaults `ANSIBLE\_PYTHON\_INTERPRETER` to a Jenkins virtual environment value, which the pipeline now sets explicitly to the freshly created venv.
-  \item \textbf{Vault} --- \texttt{ansible/vault/secrets.yml} (encrypted) stores Docker Hub credentials. The repo ignores \texttt{.vault\_pass.txt} so secrets stay local.
+  \item \textbf{Group vars} --- \texttt{ansible/inventory/group\_vars/all.yml} holds the Docker image tag, port defaults, and wires `ANSIBLE\_PYTHON\_INTERPRETER` to the Jenkins virtual environment value the pipeline exports after building its venv.
+  \item \textbf{Cleanup + Vault} --- \texttt{ansible/vault/secrets.yml} (encrypted) stores Docker Hub credentials while the deploy playbook now stops and removes any stale container before recreating it with the resolved host port, ensuring we never conflict with an older run.
   \item \textbf{Playbooks} --- \texttt{playbooks/ping.yml} checks connectivity. \texttt{playbooks/deploy.yml} logs in, pulls, and manages the container with the \texttt{always} restart policy without requiring sudo access.
 \end{itemize}
 
 \section{Results and Evidence}
 \begin{itemize}[leftmargin=*]
   \item Latest Docker push digest: pending next Jenkins run after the interpreter fix.
-  \item Deployment recap: Ansible expected to pull and recreate the container once the rerun completes; previous failure resolved by exporting the venv interpreter.
+  \item Deployment recap: Ansible now frees any stale container, selects an available host port automatically, and is expected to recreate the service on the next Jenkins rerun (the interpreter issue is already fixed).
   \item Commands to reproduce locally: \texttt{npm run lint}, \texttt{npm run test}, \texttt{npm run build}, \texttt{ansible-playbook playbooks/deploy.yml}.
 \end{itemize}
 

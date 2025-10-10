@@ -28,12 +28,25 @@
         name: "{{ docker_image }}"
         source: pull
 
+    - name: Stop existing SciCalc Next container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: stopped
+      ignore_errors: true
+
+    - name: Remove existing SciCalc Next container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+      ignore_errors: true
+
     - name: Ensure SciCalc Next container is running
       community.docker.docker_container:
         name: "{{ container_name }}"
         image: "{{ docker_image }}"
         state: started
         recreate: true
+        force_kill: true
         restart_policy: always
         published_ports:
           - "{{ host_port }}:{{ container_port }}"

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2025-10-10
+- Taught the Jenkins deploy stage to probe for a free host port (preferring 3000) before running Ansible and export the selection for the playbook.
+- Added container cleanup pre-tasks so Ansible stops and removes stale deployments before recreating the service, preventing port binding conflicts.
+- Documented the port fallback behaviour and cleanup flow in the project report.
+
+Author: CDX
+
 ## [0.3.1] - 2025-10-10
 - Ensured the Jenkins Ansible deploy stage exports the absolute virtualenv interpreter so Docker modules resolve during deployment.
 - Documented the pipeline fix in the CI/CD report.
