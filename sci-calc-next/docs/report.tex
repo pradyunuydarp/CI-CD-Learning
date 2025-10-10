@@ -43,7 +43,7 @@ Each item from the mini project checklist is satisfied as follows:
 
 \section{CI/CD Pipeline}
 \begin{itemize}[leftmargin=*]
-  \item Jenkins pulls the repository, runs the scripts above, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
+  \item Jenkins pulls the repository, wipes any stale \texttt{node\_modules} directory, runs \texttt{npm ci}, and builds the production bundle with `NODE\_ENV=production` applied only during the build command.
   \item The Docker stage logs which user is in use, logs into Docker Hub, builds \texttt{<user>/sci-calc-next:latest}, and pushes it.
   \item The Ansible stage now runs on every build. It installs collections inside a virtual environment, exports the absolute interpreter path so Docker modules resolve correctly, picks an open host port (preferring 3000 but falling back when busy), decrypts Vault secrets with the injected password, and applies \texttt{playbooks/deploy.yml}. When the pipeline finishes it sends HTML email notifications on success or failure whenever `NOTIFY\_EMAILS` is populated.
 \end{itemize}

@@ -15,6 +15,7 @@ pipeline {
       steps {
         dir('sci-calc-next') {
           sh 'node -v'
+          sh 'rm -rf node_modules'
           sh 'npm ci'
         }
       }
