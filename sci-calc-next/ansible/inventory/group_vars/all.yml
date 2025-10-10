@@ -5,3 +5,4 @@ container_name: sci-calc-next
 container_port: 3000
 host_port: "{{ lookup('env', 'HOST_PORT') | default('3000', true) }}"
 docker_registry_url: docker.io
+ansible_python_interpreter: "{{ lookup('env', 'ANSIBLE_PYTHON_INTERPRETER') | default('/usr/bin/env python3', true) }}"

@@ -36,7 +36,7 @@ Unit tests live alongside source files under `src/`. The Jenkins pipeline runs l
 The `ansible/` directory is self-contained and ships with:
 - `ansible.cfg` that pins the inventory at `inventory/hosts.ini`
 - `requirements.yml` declaring the `community.docker`, `community.general`, and `ansible.posix` collections
-- `inventory/group_vars/all.yml` for shared defaults such as the Docker image, container name, and ports
+- `inventory/group_vars/all.yml` for shared defaults such as the Docker image, container name, ports, and Python interpreter (defaults to the CI virtualenv)
 - `playbooks/ping.yml` for quick connectivity checks
 - `playbooks/deploy.yml` that pulls and runs the published container on port 3000 without requiring sudo (runs as the current Docker-enabled user)
 - `vault/secrets.yml` template bound for `ansible-vault` encryption (Docker Hub credentials)

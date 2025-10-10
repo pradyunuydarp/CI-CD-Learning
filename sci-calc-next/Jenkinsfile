@@ -71,7 +71,10 @@ pipeline {
           withCredentials([
             string(credentialsId: 'ANSIBLE_VAULT_PASS', variable: 'ANSIBLE_VAULT_PASS')
           ]) {
-            withEnv(["DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}"]) {
+            withEnv([
+              "DOCKER_IMAGE=${env.DOCKER_IMAGE ?: ''}",
+              "ANSIBLE_PYTHON_INTERPRETER=../.venv/bin/python"
+            ]) {
               sh '''
                 set -eux
                 python3 -m venv .venv

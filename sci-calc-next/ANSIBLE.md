@@ -28,8 +28,8 @@ ansible --version
 ansible/
   ansible.cfg
   requirements.yml
-  inventory/hosts.ini
-  inventory/group_vars/all.yml
+ inventory/hosts.ini
+ inventory/group_vars/all.yml
   vault/secrets.yml
   playbooks/
     ping.yml
@@ -38,7 +38,7 @@ ansible/
 ```
 - `ansible.cfg` pins the inventory, roles, and collection paths.
 - `inventory/hosts.ini` targets `localhost` by default; extend it with remote hosts as needed.
-- `inventory/group_vars/all.yml` defines shared defaults such as the Docker image, container name, and ports (with environment-variable overrides for `DOCKER_IMAGE` and `HOST_PORT`).
+- `inventory/group_vars/all.yml` defines shared defaults such as the Docker image, container name, ports, and the Python interpreter (`ANSIBLE_PYTHON_INTERPRETER` defaults to the Jenkins virtualenv, but you can override it).
 - `vault/secrets.yml` is a template file for Docker Hub credentials—encrypt it with `ansible-vault` before committing secrets.
 
 ---
@@ -86,6 +86,8 @@ Override settings with environment variables or extra-vars, e.g.:
 ```bash
 DOCKER_IMAGE=myuser/sci-calc-next:staging ansible-playbook playbooks/deploy.yml
 ansible-playbook playbooks/deploy.yml -e host_port=8080
+# point Ansible at a different Python if needed
+ANSIBLE_PYTHON_INTERPRETER=$(which python3) ansible-playbook playbooks/deploy.yml
 ```
 
 ---
