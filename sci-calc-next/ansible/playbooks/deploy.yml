@@ -8,7 +8,8 @@
     - name: Load vault credentials when available
       ansible.builtin.include_vars:
         file: ../vault/secrets.yml
-        optional: true
+      no_log: true
+      failed_when: false
 
   tasks:
     - name: Log in to Docker registry
