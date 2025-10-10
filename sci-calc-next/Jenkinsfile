@@ -120,9 +120,8 @@ pipeline {
             to: env.NOTIFY_EMAILS,
             subject: "SciCalc Next build #${env.BUILD_NUMBER} succeeded",
             mimeType: 'text/html',
-            body: "<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>
-<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>
-Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"
+            body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> completed successfully.</p>
+<p>Docker image: ${env.DOCKER_IMAGE ?: 'n/a'}<br/>Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"""
           )
         }
       }
@@ -135,8 +134,8 @@ Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>"
             to: env.NOTIFY_EMAILS,
             subject: "SciCalc Next build #${env.BUILD_NUMBER} failed",
             mimeType: 'text/html',
-            body: "<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>
-<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>",
+            body: """<p>Build <a href='${env.BUILD_URL}'>#${env.BUILD_NUMBER}</a> failed.</p>
+<p>Review the <a href='${env.BUILD_URL}console'>console log</a> for details.</p>""",
             attachLog: true
           )
         }
