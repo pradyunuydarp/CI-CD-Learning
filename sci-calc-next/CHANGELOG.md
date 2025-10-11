@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.9] - 2025-10-10
+- Expanded the report screenshot gallery with repository, Docker Hub, commit history, testing, and Jenkins console figures referenced inline.
+- Regenerated the LaTeX report via Tectonic to incorporate the new figure cross-references and updated assets.
+
+Author: CDX
+
 ## [0.3.8] - 2025-10-10
 - Added the student's roll number (IMT2022525) and IIITB email contact to the report title block.
 - Recompiled the PDF so the cover now reflects the updated author metadata.

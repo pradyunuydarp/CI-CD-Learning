@@ -45,7 +45,7 @@ DevOps is the practice of combining software development and operations so that 
 
 \section{Implementation Walkthrough}
 \subsection{Source Control Management (GitHub)}
-The project lives at \href{https://github.com/pradyunuydarp/CI-CD-Learning}{github.com/pradyunuydarp/CI-CD-Learning}. The \texttt{sci-calc-next} directory is the Next.js workspace. Typical commands:
+The project lives at \href{https://github.com/pradyunuydarp/CI-CD-Learning}{github.com/pradyunuydarp/CI-CD-Learning}, and the repository layout is highlighted in Figure~\ref{fig:repo-overview}. The \texttt{sci-calc-next} directory is the Next.js workspace. Typical commands:
 \begin{verbatim}
 # clone
 $ git clone https://github.com/pradyunuydarp/CI-CD-Learning.git
@@ -57,7 +57,7 @@ $ git add src/app/page.tsx
 $ git commit -m "feat(ui): surface factorial operation"
 $ git push origin feat/new-capability
 \end{verbatim}
-Jenkins tracks the \texttt{main} branch via a GitHub webhook, so every push schedules a pipeline run automatically.
+The incremental commit trail shown in Figure~\ref{fig:commit-history} documents each feature, test, and deployment tweak. Jenkins tracks the \texttt{main} branch via a GitHub webhook, so every push schedules a pipeline run automatically.
 
 \subsection{Testing and Quality Gates}
 Unit tests use Vitest and live in \texttt{src/lib/math.test.ts}. Linting enforces Next.js conventions. Both run locally and in CI:
@@ -65,7 +65,7 @@ Unit tests use Vitest and live in \texttt{src/lib/math.test.ts}. Linting enforce
 $ npm run lint
 $ npm run test
 \end{verbatim}
-The pipeline stops if either command fails, preventing regressions from reaching Docker build or deployment stages.
+The pipeline stops if either command fails, preventing regressions from reaching Docker build or deployment stages. Figure~\ref{fig:tests-success} captures the passing Vitest suite executed before container builds progress.
 
 \subsection{Build Automation}
 The production bundle is created with the standard Next.js build command:
@@ -75,7 +75,7 @@ $ npm run build
 In Jenkins, the build stage sets \texttt{NODE\_ENV=production} inline for the command so that devDependencies remain available during earlier steps.
 
 \subsection{Continuous Integration with Jenkins}
-The Jenkinsfile orchestrates every step. The Install stage now clears leftover dependencies to avoid \texttt{ENOTEMPTY} errors before running \texttt{npm ci}. Relevant excerpt:
+The Jenkinsfile orchestrates every step, with the stage progression captured in Figure~\ref{fig:pipeline}. The Install stage now clears leftover dependencies to avoid \texttt{ENOTEMPTY} errors before running \texttt{npm ci}. Relevant excerpt:
 \begin{verbatim}
 stage('Install') {
   steps {
@@ -126,7 +126,7 @@ Host port: ${env.DEPLOY_HOST_PORT ?: '3000'}</p>
   }
 }
 \end{verbatim}
-During the 10~Oct~2025 run at 16:34 the script detected that port~3000 was occupied, selected 3300 automatically, and completed deployment without manual intervention.
+During the 10~Oct~2025 run at 16:34 the script detected that port~3000 was occupied, selected 3300 automatically, and completed deployment without manual intervention, as evidenced by the console trace in Figure~\ref{fig:jenkins-console}.
 
 \subsection{Containerization}
 The Dockerfile performs a multi-stage build. Key fragment:
@@ -158,7 +158,7 @@ docker build -t "${DOCKERHUB_USER}/sci-calc-next:latest" .
 docker push "${DOCKERHUB_USER}/sci-calc-next:latest"
 docker logout
 \end{verbatim}
-The resulting image is visible under \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next/tags}{Docker Hub tags}.
+The resulting image is visible under \href{https://hub.docker.com/r/pradyunuydarp/sci-calc-next/tags}{Docker Hub tags}, and Figure~\ref{fig:dockerhub} shows the live repository page.
 
 \subsection{Configuration Management and Deployment}
 Ansible handles the final delivery. Inventory and group variables pin the container name, port mapping, and interpreter:
@@ -203,11 +203,11 @@ The deploy playbook removes stale containers, pulls the requested image, and rec
     env:
       NODE_ENV: production
 \end{verbatim}
-During the successful Jenkins run, the play recap reported \texttt{ok=3 changed=1 failed=0}, confirming the container restart on the new port.
+During the successful Jenkins run, the play recap reported \texttt{ok=3 changed=1 failed=0}, confirming the container restart on the new port (Figure~\ref{fig:ansible}).
 
 \section{Application Experience}
 \subsection*{User Journey}
-Landing on \texttt{/} presents a centered glassmorphism shell with the "SciCalc Next" banner and a two-column layout on desktop. The left pane hosts the interactive form: four quick-action pills switch between square root, factorial, natural logarithm, and power, while an optional free-form expression box accepts inputs such as \texttt{5!}, \texttt{sqrt(144)}, \texttt{ln(10)}, or \texttt{pow(2,8)}. Selecting an operation swaps in the relevant structured fields (single numeric input for unary functions, paired base/exponent inputs for power) so the user can either type shorthand math or rely on labelled controls.
+Landing on \texttt{/} presents a centered glassmorphism shell with the "SciCalc Next" banner and a two-column layout on desktop. Figure~\ref{fig:ui} illustrates the default view alongside the responsive controls. The left pane hosts the interactive form: four quick-action pills switch between square root, factorial, natural logarithm, and power, while an optional free-form expression box accepts inputs such as \texttt{5!}, \texttt{sqrt(144)}, \texttt{ln(10)}, or \texttt{pow(2,8)}. Selecting an operation swaps in the relevant structured fields (single numeric input for unary functions, paired base/exponent inputs for power) so the user can either type shorthand math or rely on labelled controls.
 
 \subsection*{Feedback Loop}
 Submitting the form issues a \texttt{POST} to \texttt{/api/calc}, which validates the payload and runs the math helpers. Results appear instantly in the right-hand "Result preview" card, formatted with up to six decimal places and wrapped in a scrollable badge for long outputs. A single click copies the numeric answer to the clipboard and surfaces a transient "Copied!" indicator; unsupported clipboard environments fall back to an inline warning instead of failing silently.
@@ -284,6 +284,41 @@ The figures below showcase core artefacts captured during the project.
   \includegraphics[width=0.85\linewidth]{../../screenshots/ansible-deploy.png}
   \caption{Ansible play recap from Jenkins showing the container restart with host port realignment.}
   \label{fig:ansible}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../../screenshots/repo-overview.png}
+  \caption{Repository explorer highlighting the SciCalc Next workspace and key configuration files.}
+  \label{fig:repo-overview}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../../screenshots/dockerhub-repo.png}
+  \caption{Docker Hub page showing the \texttt{pradyunuydarp/sci-calc-next} image tags and metadata.}
+  \label{fig:dockerhub}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../../screenshots/git-history.png}
+  \caption{Commit history illustrating incremental feature, test, and deployment changes.}
+  \label{fig:commit-history}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../../screenshots/tests-success.png}
+  \caption{Terminal output confirming a successful \texttt{npm run test} (Vitest) execution.}
+  \label{fig:tests-success}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\linewidth]{../../screenshots/jenkins-console.png}
+  \caption{Console output from the Jenkins pipeline demonstrating a successful end-to-end run.}
+  \label{fig:jenkins-console}
 \end{figure}
 
 \clearpage
