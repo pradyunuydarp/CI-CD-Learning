@@ -49,17 +49,17 @@ pipeline {
                 passwordVariable: 'DOCKERHUB_TOKEN'
               )
             ]) {
-              def image = "${DOCKERHUB_USER}/sci-calc-next:latest"
-              env.DOCKER_IMAGE = image
-              sh """
+            def image = "${DOCKERHUB_USER}/sci-calc-next:latest"
+            env.DOCKER_IMAGE = image
+            sh '''
                 #!/bin/bash
                 set -eux
-                echo "Using Docker Hub user: ${DOCKERHUB_USER}"
-                echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
-                docker build -t "${image}" .
-                docker push "${image}"
+                echo "Using Docker Hub user: $DOCKERHUB_USER"
+                echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                docker build -t "$DOCKER_IMAGE" .
+                docker push "$DOCKER_IMAGE"
                 docker logout
-              """
+              '''
             }
           }
         }
