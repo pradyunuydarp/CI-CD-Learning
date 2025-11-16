@@ -89,7 +89,7 @@ pipeline {
               echo "Using host port ${selectedPort} for deployment"
               env.DEPLOY_HOST_PORT = selectedPort
               def dockerHost = sh(
-                script: "docker context inspect $(docker context show) --format '{{ (index .Endpoints \"docker\").Host }}'",
+                script: "docker context inspect \\$(docker context show) --format '{{ (index .Endpoints \"docker\").Host }}'",
                 returnStdout: true
               ).trim()
               if (!dockerHost) {
