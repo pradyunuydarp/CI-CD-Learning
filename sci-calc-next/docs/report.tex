@@ -176,6 +176,8 @@ host_port: "{{ lookup('env', 'HOST_PORT') | default('3000', true) }}"
 ansible_python_interpreter: "{{ lookup('env', 'ANSIBLE_PYTHON_INTERPRETER') | default('/usr/bin/env python3', true) }}"
 \end{verbatim}
 
+When the 16~Nov~2025 Jenkins deploy failed with \texttt{Error while fetching server API version: FileNotFoundError(2, '/var/run/docker.sock')}, the playbook and pipeline were patched to export the active Docker context host (for example \texttt{unix:///Users/pradyundevarakonda/.docker/run/docker.sock}) via \texttt{DOCKER\_HOST}. Module defaults now reuse that value across login, image pulls, and container tasks so the Docker SDK can reach the desktop daemon even when the socket path is non-standard.
+
 The deploy playbook removes stale containers, pulls the requested image, and recreates the service:
 \begin{verbatim}
 - name: Stop existing SciCalc Next container
