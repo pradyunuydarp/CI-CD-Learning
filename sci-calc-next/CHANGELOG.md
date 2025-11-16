@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.10] - 2025-11-16
+- Propagated the active Docker context host into the Ansible deploy stage and Docker SDK modules so Jenkins can talk to the daemon even when the socket path differs from `/var/run/docker.sock`.
+- Added playbook defaults to share the resolved `DOCKER_HOST` across login, image, and container tasks for consistent deployments.
+
+Author: CDX
+
 ## [0.3.9] - 2025-10-10
 - Expanded the report screenshot gallery with repository, Docker Hub, commit history, testing, and Jenkins console figures referenced inline.
 - Regenerated the LaTeX report via Tectonic to incorporate the new figure cross-references and updated assets.

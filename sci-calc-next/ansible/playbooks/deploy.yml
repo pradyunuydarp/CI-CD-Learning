@@ -4,6 +4,17 @@
   gather_facts: false
   collections:
     - community.docker
+  vars:
+    docker_host: "{{ lookup('env', 'DOCKER_HOST') | default('unix:///var/run/docker.sock', true) }}"
+  environment:
+    DOCKER_HOST: "{{ docker_host }}"
+  module_defaults:
+    community.docker.docker_login:
+      docker_host: "{{ docker_host }}"
+    community.docker.docker_image:
+      docker_host: "{{ docker_host }}"
+    community.docker.docker_container:
+      docker_host: "{{ docker_host }}"
   pre_tasks:
     - name: Load vault credentials when available
       ansible.builtin.include_vars:
